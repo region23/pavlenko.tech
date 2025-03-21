@@ -83,7 +83,7 @@ function renderPostTags(tags) {
   tags.forEach(tag => {
     const tagLink = createElement('a', { 
       href: `/tags/${tag}`,
-      className: 'post-tag'
+      className: 'tag'
     }, tag);
     
     tagsContainer.appendChild(tagLink);
@@ -93,111 +93,61 @@ function renderPostTags(tags) {
 }
 
 /**
- * Рендерит hero секцию в стиле Apple
- * @param {HTMLElement} container - Контейнер для hero секции
- * @param {string} title - Заголовок hero секции
- * @param {string} subtitle - Подзаголовок hero секции
- */
-function renderHero(container, title = 'Pavlenko.Tech', subtitle = 'Технический блог о разработке, технологиях и программировании') {
-  container.innerHTML = '';
-  
-  const heroSection = createElement('section', { className: 'hero' });
-  const heroContainer = createElement('div', { className: 'container' });
-  
-  const heroTitle = createElement('h1', {}, title);
-  const heroSubtitle = createElement('p', {}, subtitle);
-  
-  heroContainer.appendChild(heroTitle);
-  heroContainer.appendChild(heroSubtitle);
-  heroSection.appendChild(heroContainer);
-  
-  container.appendChild(heroSection);
-}
-
-/**
  * Рендеринг списка статей
  * @param {Array} posts - Массив статей
  * @param {HTMLElement} container - Контейнер для вывода
  * @param {string} title - Заголовок списка (опционально)
  */
 function renderPostList(posts, container, title = 'Последние статьи') {
+  if (!container) return;
+  
+  const heading = createElement('h1', {}, title);
+  
   // Очищаем контейнер
   container.innerHTML = '';
-  
-  // Добавляем hero секцию на главную страницу
-  const heroContainer = document.getElementById('hero-container');
-  if (heroContainer) {
-    renderHero(heroContainer);
-  }
-  
-  // Создаем заголовок списка
-  const heading = createElement('h2', {}, title);
   container.appendChild(heading);
   
-  // Если нет статей
-  if (!posts || !Array.isArray(posts) || posts.length === 0) {
-    const emptyMessage = createElement('p', {}, 'Статьи не найдены.');
-    container.appendChild(emptyMessage);
+  if (!posts || posts.length === 0) {
+    container.appendChild(createElement('p', {}, 'Статьи не найдены'));
     return;
   }
   
-  // Создаем список статей
-  const postList = createElement('ul', { className: 'post-list' });
+  const list = createElement('ul', { className: 'post-list' });
   
-  // Добавляем каждую статью в список
+  // Рендерим каждую статью в списке
   posts.forEach(post => {
-    const postItem = createElement('li', { className: 'post-item' });
+    const slug = post.slug || post.path.split('/').pop().replace('.md', '');
+    const postUrl = `/posts/${slug}`;
+    const formattedDate = formatDate(post.date);
     
-    // Добавляем изображение (превью)
-    const thumbnail = createElement('div', { className: 'post-thumbnail' });
-    const thumbnailImg = createElement('img', { 
-      src: post.thumbnail || '/images/default-thumbnail.svg',
-      alt: post.title,
-      onerror: "this.src='/images/default-thumbnail.svg'"
-    });
-    thumbnail.appendChild(thumbnailImg);
-    postItem.appendChild(thumbnail);
+    const listItem = createElement('li', { className: 'post-item' });
     
-    // Контент поста
-    const postContent = createElement('div', { className: 'post-content' });
+    // Заголовок
+    const titleEl = createElement('h2', { className: 'post-title' },
+      createElement('a', { href: postUrl }, post.title || 'Без названия')
+    );
+    listItem.appendChild(titleEl);
     
-    // Заголовок с ссылкой
-    const titleElement = createElement('h3', { className: 'post-title' });
-    const titleLink = createElement('a', { href: `/posts/${post.slug}` }, post.title);
-    titleElement.appendChild(titleLink);
-    
-    // Метаданные (дата, автор)
-    const metaElement = createElement('div', { className: 'post-meta' });
-    
-    // Дата публикации
-    if (post.date) {
-      const dateElement = createElement('span', { className: 'post-date' }, formatDate(post.date));
-      metaElement.appendChild(dateElement);
+    // Дата
+    if (formattedDate) {
+      listItem.appendChild(createElement('div', { className: 'post-meta' }, formattedDate));
     }
     
-    // Краткое описание
-    const summaryElement = createElement('p', { className: 'post-summary' }, post.summary || post.excerpt || '');
-    
-    // Добавляем все элементы в контент
-    postContent.appendChild(titleElement);
-    postContent.appendChild(metaElement);
-    postContent.appendChild(summaryElement);
-    
-    // Добавляем теги, если они есть
-    const tagsElement = renderPostTags(post.tags);
-    if (tagsElement) {
-      postContent.appendChild(tagsElement);
+    // Описание
+    if (post.summary) {
+      listItem.appendChild(createElement('p', { className: 'post-summary' }, post.summary));
     }
     
-    // Добавляем содержимое в карточку
-    postItem.appendChild(postContent);
+    // Теги
+    const tagsEl = renderPostTags(post.tags);
+    if (tagsEl) {
+      listItem.appendChild(tagsEl);
+    }
     
-    // Добавляем карточку в список
-    postList.appendChild(postItem);
+    list.appendChild(listItem);
   });
   
-  // Добавляем список в контейнер
-  container.appendChild(postList);
+  container.appendChild(list);
 }
 
 /**
@@ -207,71 +157,101 @@ function renderPostList(posts, container, title = 'Последние стать
  * @param {HTMLElement} container - Контейнер для вывода
  */
 async function renderPost(postData, content, container) {
-  // Очищаем контейнер
-  container.innerHTML = '';
+  if (!container) return;
   
-  // Скрываем hero секцию на странице статьи
-  const heroContainer = document.getElementById('hero-container');
-  if (heroContainer) {
-    heroContainer.innerHTML = '';
-  }
+  container.innerHTML = '<div class="loader">Загрузка статьи...</div>';
   
-  // Создаем основной контейнер для статьи
-  const article = createElement('article', { className: 'article' });
-  
-  // Создаем шапку статьи
-  const header = createElement('header', { className: 'article-header' });
-  
-  // Заголовок статьи
-  const title = createElement('h1', { className: 'article-title' }, postData.title || 'Без названия');
-  header.appendChild(title);
-  
-  // Метаданные статьи (дата, автор)
-  const meta = createElement('div', { className: 'article-meta' });
-  
-  // Дата публикации
-  if (postData.date) {
-    const dateElement = createElement('span', { className: 'post-date' }, formatDate(postData.date));
-    meta.appendChild(dateElement);
-  }
-  
-  header.appendChild(meta);
-  
-  // Теги
-  const tagsElement = renderPostTags(postData.tags);
-  if (tagsElement) {
-    header.appendChild(tagsElement);
-  }
-  
-  article.appendChild(header);
-  
-  // Содержимое статьи
   try {
-    const renderedContent = await renderMarkdown(content);
+    console.log('Рендеринг статьи:', postData.title);
     
-    // Обрабатываем содержимое и создаем элемент контента
-    const contentElement = createElement('div', { className: 'article-content' });
-    contentElement.innerHTML = renderedContent;
+    if (!content) {
+      throw new Error('Не удалось загрузить содержимое статьи');
+    }
     
-    // Обработка изображений
-    processContentImages(contentElement, postData);
+    // Дополнительно убеждаемся, что frontmatter полностью удален
+    // Регулярное выражение для frontmatter (более надежное)
+    const frontmatterRegex = /^---[\s\S]*?---\s*/;
+    
+    // Удаляем frontmatter из контента
+    const cleanContent = content.replace(frontmatterRegex, '');
+    
+    console.log('Содержимое после удаления frontmatter:', cleanContent.length > 0 ? 'Не пусто' : 'Пусто');
+    
+    // Удаляем заголовок первого уровня из Markdown (обычно это заголовок статьи)
+    // Ищем первый заголовок первого уровня в начале документа: # Заголовок
+    const titleRegex = /^\s*# .+?\n/m;
+    const contentWithoutTitle = cleanContent.replace(titleRegex, '');
+    
+    console.log('Удаление заголовка статьи из Markdown контента:', 
+      contentWithoutTitle.length < cleanContent.length ? 'Заголовок удален' : 'Заголовок не найден');
+    
+    // Подготавливаем код перед преобразованием
+    // Если в коде есть шаблонные строки JavaScript с ${}, предварительно экранируем их
+    const preparedContent = contentWithoutTitle.replace(/```javascript\s+([\s\S]*?)```/g, (match, code) => {
+      return '```javascript\n' + code.replace(/\${/g, '\\${') + '```';
+    });
+    
+    // Преобразуем Markdown в HTML
+    const htmlContent = await renderMarkdown(preparedContent);
+    
+    if (!htmlContent) {
+      throw new Error('Не удалось преобразовать Markdown в HTML');
+    }
+    
+    // Создаем разметку статьи
+    const article = createElement('article', { className: 'post' });
+    
+    // Создаем заголовок
+    const header = createElement('header', { className: 'post-header' });
+    header.appendChild(createElement('h1', {}, postData.title || 'Без названия'));
+    
+    if (postData.date) {
+      header.appendChild(createElement('div', { className: 'post-meta' }, formatDate(postData.date)));
+    }
+    
+    const tagsEl = renderPostTags(postData.tags);
+    if (tagsEl) {
+      header.appendChild(tagsEl);
+    }
+    
+    article.appendChild(header);
+    
+    // Добавляем содержимое статьи
+    const contentElement = createElement('div', { 
+      className: 'post-content'
+    });
+    
+    // Используем innerHTML для вставки HTML-контента
+    contentElement.innerHTML = htmlContent;
     
     article.appendChild(contentElement);
-  } catch (error) {
-    console.error('Ошибка при рендеринге статьи:', error);
     
-    const errorMessage = createElement('div', { className: 'error' }, 
-      `Не удалось обработать содержимое статьи: ${error.message}`
+    // Добавляем кнопку "Назад"
+    const backButton = createElement('div', { className: 'back-link' },
+      createElement('a', { href: '/' }, '&larr; Назад к списку статей')
     );
     
-    article.appendChild(errorMessage);
+    // Очищаем контейнер и добавляем статью
+    container.innerHTML = '';
+    container.appendChild(article);
+    container.appendChild(backButton);
+    
+    console.log('Статья успешно отрендерена');
+    
+  } catch (error) {
+    console.error('Ошибка при рендеринге статьи:', error);
+    container.innerHTML = '';
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, error);
+    
+    // Добавляем кнопку "Назад" даже при ошибке
+    const backButton = createElement('div', { className: 'back-link' },
+      createElement('a', { href: '/' }, '&larr; Назад к списку статей')
+    );
+    container.appendChild(backButton);
   }
-  
-  // Добавляем статью в контейнер
-  container.appendChild(article);
-  
-  // Обновляем заголовок страницы
-  document.title = `${postData.title || 'Статья'} | Pavlenko.Tech`;
 }
 
 /**
