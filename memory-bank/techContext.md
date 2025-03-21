@@ -18,7 +18,7 @@
 ## Настройка окружения разработки
 ```bash
 # Клонирование репозитория
-git clone https://github.com/user/pavlenko.tech.git
+git clone https://github.com/region23/pavlenko.tech.git
 cd pavlenko.tech
 
 # Установка зависимостей
