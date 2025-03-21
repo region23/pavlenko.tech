@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'pavlenko.tech/content/posts/**.md'  # Запускать только когда изменяются markdown файлы в posts
+      - 'content/posts/**.md'  # Запускать только когда изменяются markdown файлы в posts
 
 jobs:
   update-index:
@@ -22,17 +22,17 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
-        working-directory: ./pavlenko.tech
+        working-directory: ./
       
       - name: Run update-index script
         run: npm run update-index
-        working-directory: ./pavlenko.tech
+        working-directory: ./
       
       - name: Commit changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add pavlenko.tech/content/posts/index.json
+          git add content/posts/index.json
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update index.json"
       
       - name: Push changes
