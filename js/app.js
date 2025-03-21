@@ -3,7 +3,7 @@
  */
 
 // Импорт модулей
-import { initRouter, navigateTo } from './router.js';
+import { initRouter, navigateTo, getCurrentRoute } from './router.js';
 import { fetchContentList, fetchContent, processFrontmatter, clearContentCache } from './content.js';
 import { renderPostList, renderPost, renderTagsList, renderAbout, renderError } from './ui.js';
 
@@ -12,7 +12,8 @@ const state = {
   posts: [],
   tags: {},
   currentRoute: null,
-  isLoading: false
+  isLoading: false,
+  aboutContent: null
 };
 
 // Маршруты приложения
@@ -46,276 +47,394 @@ async function initApp() {
   try {
     console.log("Инициализация приложения");
     
-    // Загрузка данных
-    await loadAppData();
+    // Находим элемент контента
+    const contentElement = document.getElementById('content');
+    if (!contentElement) {
+      throw new Error('Элемент контента не найден');
+    }
     
     // Инициализация роутера
     initRouter(handleRouteChange);
     
-    // Обработка кликов по навигационным ссылкам
-    document.addEventListener('click', handleNavigation);
+    // Загрузка данных приложения
+    await loadAppData();
+    
+    // Обработка текущего маршрута
+    const currentPath = getCurrentRoute();
+    handleRouteChange(currentPath);
+    
+    console.log("Инициализация завершена");
   } catch (error) {
-    console.error('Ошибка инициализации приложения:', error);
-    renderError('Ошибка загрузки данных. Пожалуйста, обновите страницу.');
+    console.error("Ошибка инициализации приложения:", error);
+    const errorElement = document.getElementById('error-container');
+    if (errorElement) {
+      renderError(errorElement, error);
+    }
   }
 }
 
 /**
- * Загрузка данных приложения
+ * Загрузка данных приложения (посты, теги)
+ * @returns {Promise<boolean>} - Результат загрузки
  */
 async function loadAppData() {
   try {
-    // Загрузка списка статей
-    const posts = await fetchContentList('content/posts');
+    console.log('Загрузка данных приложения...');
     
-    if (posts && posts.length > 0) {
-      // Сортировка статей по дате (сначала новые)
-      state.posts = posts.sort((a, b) => 
-        new Date(b.date || 0) - new Date(a.date || 0)
-      );
-      
-      // Формирование списка тегов
-      state.tags = posts.reduce((tags, post) => {
-        if (post.tags && Array.isArray(post.tags)) {
-          post.tags.forEach(tag => {
-            tags[tag] = (tags[tag] || 0) + 1;
-          });
-        }
-        return tags;
-      }, {});
-      
-      console.log(`Загружено ${posts.length} статей`);
+    // Устанавливаем флаг загрузки
+    state.isLoading = true;
+    
+    // Загружаем список статей
+    const posts = await fetchContentList();
+    
+    // Проверяем, загрузились ли статьи
+    if (!posts || posts.length === 0) {
+      console.error('Не удалось загрузить статьи или список пуст');
+      state.isLoading = false;
+      return false;
     }
+    
+    // Добавляем path к каждому посту, если его нет
+    posts.forEach(post => {
+      if (!post.path && post.file) {
+        post.path = `content/posts/${post.file}.md`;
+      }
+    });
+    
+    // Обновляем состояние приложения
+    state.posts = posts;
+    
+    // Формируем карту тегов из постов
+    const tags = {};
+    
+    posts.forEach(post => {
+      if (post.tags && Array.isArray(post.tags)) {
+        post.tags.forEach(tag => {
+          if (!tags[tag]) {
+            tags[tag] = 1;
+          } else {
+            tags[tag]++;
+          }
+        });
+      }
+    });
+    
+    // Обновляем теги в состоянии приложения
+    state.tags = tags;
+    
+    console.log(`Загружено ${posts.length} статей и ${Object.keys(tags).length} тегов`);
+    
+    // Завершаем загрузку
+    state.isLoading = false;
+    return true;
   } catch (error) {
-    console.error('Ошибка при загрузке данных:', error);
+    console.error('Ошибка при загрузке данных приложения:', error);
+    state.isLoading = false;
     throw error;
   }
 }
 
 /**
  * Обработка изменения маршрута
- * @param {string} pathname - Путь URL
+ * @param {string} path - Путь маршрута
  */
-async function handleRouteChange(pathname) {
-  if (state.isLoading) return;
-  
-  console.log(`Обработка маршрута: ${pathname}`);
-  
-  // Показываем индикатор загрузки
-  const contentElement = document.getElementById('content');
-  contentElement.innerHTML = '<div class="loader">Загрузка...</div>';
-  
-  // Обновление текущего маршрута
-  state.currentRoute = pathname;
-  state.isLoading = true;
-  
+async function handleRouteChange(path) {
   try {
-    // Определяем обработчик для маршрута
-    let routeHandler = null;
-    let routeParams = [];
+    console.log(`Обработка маршрута: ${path}`);
     
-    for (const [name, route] of Object.entries(routes)) {
-      const match = pathname.match(route.pattern);
+    // Находим элемент контента
+    const contentElement = document.getElementById('content');
+    if (!contentElement) {
+      throw new Error('Элемент контента не найден');
+    }
+    
+    // Проверяем, загружены ли необходимые данные
+    if (!state.posts || state.posts.length === 0) {
+      console.log('Данные не загружены, выполняем загрузку...');
+      await loadAppData();
+    }
+    
+    // Устанавливаем текущий маршрут
+    state.currentRoute = path;
+    
+    // Показываем индикатор загрузки
+    contentElement.innerHTML = '<div class="loading">Загрузка...</div>';
+    state.isLoading = true;
+    
+    // Определяем, какой обработчик вызвать
+    let handled = false;
+    
+    for (const [routeName, route] of Object.entries(routes)) {
+      const match = path.match(route.pattern);
       if (match) {
-        routeHandler = route.handler;
-        routeParams = match.slice(1);
+        console.log(`Найден маршрут: ${routeName}`);
+        // Очищаем содержимое перед обработкой маршрута
+        contentElement.innerHTML = '';
+        // Вызываем соответствующий обработчик
+        await route.handler(contentElement, ...(match.slice(1)));
+        // Обновляем активную ссылку в навигации
+        updateActiveNavLink(path);
+        handled = true;
         break;
       }
     }
     
-    // Если обработчик найден, вызываем его
-    if (routeHandler) {
-      await routeHandler(contentElement, ...routeParams);
-    } else {
-      // 404 - страница не найдена
-      console.error(`Страница не найдена: ${pathname}`);
-      renderError('Страница не найдена', contentElement);
-      updatePageMeta('404: Страница не найдена', 'Запрашиваемая страница не существует');
+    // Если маршрут не найден, показываем 404
+    if (!handled) {
+      console.log('Маршрут не найден, показываем 404');
+      contentElement.innerHTML = '';
+      const errorContainer = document.createElement('div');
+      errorContainer.className = 'error-container';
+      contentElement.appendChild(errorContainer);
+      renderError(errorContainer, { message: 'Страница не найдена' }, 404);
+      updatePageMeta('Страница не найдена', 'Запрашиваемая страница не найдена');
     }
     
-    // Обновление активного пункта меню
-    updateActiveNavLink(pathname);
+    // Скрываем индикатор загрузки
+    state.isLoading = false;
+    
   } catch (error) {
-    console.error('Ошибка обработки маршрута:', error);
-    renderError('Что-то пошло не так. Пожалуйста, попробуйте еще раз.', contentElement);
-  } finally {
+    console.error("Ошибка обработки маршрута:", error);
+    const contentElement = document.getElementById('content');
+    if (contentElement) {
+      contentElement.innerHTML = '';
+      const errorContainer = document.createElement('div');
+      errorContainer.className = 'error-container';
+      contentElement.appendChild(errorContainer);
+      renderError(errorContainer, error);
+    }
     state.isLoading = false;
   }
 }
 
 /**
  * Обработчик маршрута главной страницы
- * @param {HTMLElement} container - Контейнер для рендеринга
+ * @param {HTMLElement} container - Контейнер для отображения содержимого
  */
 async function handleHomeRoute(container) {
+  console.log('Отображение главной страницы со статьями');
+  
+  if (!state.posts || state.posts.length === 0) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Не удалось загрузить статьи' });
+    return;
+  }
+  
+  // Отображаем список статей
   renderPostList(state.posts, container);
+  
+  // Обновляем мета-теги для SEO
   updatePageMeta('Технический блог', 'Блог о разработке и технологиях');
 }
 
 /**
  * Обработчик маршрута отдельной статьи
- * @param {HTMLElement} container - Контейнер для рендеринга
+ * @param {HTMLElement} container - Контейнер для отображения содержимого
  * @param {string} slug - Идентификатор статьи
  */
 async function handlePostRoute(container, slug) {
-  if (!slug) {
-    renderError('Неверный URL статьи', container);
+  console.log('Отображение отдельной статьи, slug:', slug);
+  
+  if (!state.posts || state.posts.length === 0) {
+    console.error('Нет загруженных статей');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Не удалось загрузить статьи' });
     return;
   }
-  
-  console.log(`Поиск статьи по slug: ${slug}`);
   
   // Находим статью по slug
-  const postData = state.posts.find(post => {
-    const postSlug = post.slug || post.path.split('/').pop().replace('.md', '');
-    return postSlug === slug;
-  });
-  
-  if (!postData) {
-    console.error(`Статья не найдена по slug: ${slug}`);
-    renderError('Статья не найдена', container);
-    updatePageMeta('Статья не найдена', 'Запрашиваемая статья не существует');
-    return;
-  }
-  
-  console.log(`Статья найдена: ${postData.title}`);
-  const postPath = postData.path || `content/posts/${slug}.md`;
-  
-  try {
-    const postContent = await fetchContent(postPath);
-    
-    if (postContent) {
-      renderPost(postData, postContent, container);
-      updatePageMeta(postData.title, postData.summary || '');
-    } else {
-      renderError('Содержимое статьи не найдено', container);
-      updatePageMeta('Ошибка', 'Не удалось загрузить содержимое статьи');
-    }
-  } catch (error) {
-    console.error('Ошибка при загрузке статьи:', error);
-    renderError('Ошибка при загрузке статьи', container);
-  }
-}
-
-/**
- * Обработчик маршрута страницы тегов
- * @param {HTMLElement} container - Контейнер для рендеринга
- */
-async function handleTagsRoute(container) {
-  renderTagsList(state.tags, container);
-  updatePageMeta('Теги', 'Список всех тегов');
-}
-
-/**
- * Обработчик маршрута отдельного тега
- * @param {HTMLElement} container - Контейнер для рендеринга
- * @param {string} tag - Тег для фильтрации статей
- */
-async function handleTagRoute(container, tag) {
-  if (!tag) {
-    renderError('Неверный URL тега', container);
-    return;
-  }
-  
-  const filteredPosts = state.posts.filter(post => 
-    post.tags && post.tags.includes(tag)
+  const post = state.posts.find(p => 
+    (p.slug === slug) || (p.file === slug)
   );
   
-  renderPostList(filteredPosts, container, `Статьи с тегом: ${tag}`);
-  updatePageMeta(`Тег: ${tag}`, `Статьи с тегом ${tag}`);
+  if (post) {
+    console.log('Статья найдена:', post.title, 'Путь:', post.path);
+    
+    try {
+      // Создаем путь к файлу, если он не указан
+      const filePath = post.path || `content/posts/${post.file}.md`;
+      console.log('Используем путь для загрузки:', filePath);
+      
+      // Загружаем содержимое статьи
+      const content = await fetchContent(filePath);
+      console.log('Содержимое получено:', content ? 'успешно' : 'пусто');
+      
+      // Рендерим статью
+      renderPost(post, content, container);
+      
+      // Обновляем мета-теги для SEO
+      updatePageMeta(post.title, post.summary || '');
+    } catch (error) {
+      console.error('Ошибка при загрузке статьи:', error);
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-container';
+      container.appendChild(errorDiv);
+      renderError(errorDiv, error);
+    }
+  } else {
+    console.error('Статья не найдена:', slug);
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Статья не найдена' }, 404);
+    updatePageMeta('Статья не найдена', 'Запрашиваемая статья не найдена');
+  }
 }
 
 /**
- * Обработчик маршрута страницы about
- * @param {HTMLElement} container - Контейнер для рендеринга
+ * Обработчик маршрута для страницы со списком тегов
+ * @param {HTMLElement} container - Контейнер для отображения содержимого
+ */
+async function handleTagsRoute(container) {
+  console.log('Отображение страницы со списком тегов');
+  
+  if (!state.tags || Object.keys(state.tags).length === 0) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Не удалось загрузить теги' });
+    return;
+  }
+  
+  // Отображаем список тегов
+  renderTagsList(state.tags, container);
+  
+  // Обновляем мета-теги для SEO
+  updatePageMeta('Теги', 'Список тегов блога');
+}
+
+/**
+ * Обработчик маршрута для страницы с постами по тегу
+ * @param {HTMLElement} container - Контейнер для отображения содержимого
+ * @param {string} tag - Имя тега
+ */
+async function handleTagRoute(container, tag) {
+  console.log('Отображение статей по тегу:', tag);
+  
+  if (!state.tags || Object.keys(state.tags).length === 0 || !state.posts) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Не удалось загрузить данные' });
+    return;
+  }
+  
+  // Проверяем, существует ли такой тег
+  if (state.tags[tag]) {
+    // Фильтруем статьи по тегу
+    const filteredPosts = state.posts.filter(post => 
+      post.tags && post.tags.includes(tag)
+    );
+    
+    renderPostList(filteredPosts, container, `Статьи по тегу: ${tag}`);
+    
+    // Обновляем мета-теги для SEO
+    updatePageMeta(`Тег: ${tag}`, `Статьи по тегу ${tag}`);
+  } else {
+    console.error('Тег не найден:', tag);
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, { message: 'Тег не найден' }, 404);
+    updatePageMeta('Тег не найден', 'Запрашиваемый тег не найден');
+  }
+}
+
+/**
+ * Обработчик маршрута страницы About
+ * @param {HTMLElement} container - Контейнер для отображения содержимого
  */
 async function handleAboutRoute(container) {
+  console.log('Отображение страницы о проекте');
+  
   try {
+    // Загружаем содержимое страницы
     const aboutContent = await fetchContent('content/about/index.md');
     
-    if (aboutContent) {
-      const aboutData = processFrontmatter(aboutContent) || {};
-      renderAbout(aboutData, container);
-      updatePageMeta('About', aboutData.title || 'Обо мне');
-    } else {
-      renderError('Информация не найдена', container);
-      updatePageMeta('About', 'Информация об авторе');
+    if (!aboutContent) {
+      console.error('Не удалось загрузить страницу о проекте');
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-container';
+      container.appendChild(errorDiv);
+      renderError(errorDiv, { message: 'Не удалось загрузить информацию о проекте' });
+      return;
     }
+    
+    // Обрабатываем frontmatter и получаем данные
+    const aboutData = processFrontmatter(aboutContent);
+    
+    // Сохраняем контент в состояние
+    state.aboutContent = aboutData;
+    
+    // Рендерим страницу
+    renderAbout(aboutData, container);
+    
+    // Обновляем мета-теги для SEO
+    updatePageMeta('Обо мне', 'Информация об авторе блога');
   } catch (error) {
-    console.error('Ошибка при загрузке страницы about:', error);
-    renderError('Ошибка при загрузке информации', container);
+    console.error('Ошибка при обработке страницы о проекте:', error);
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-container';
+    container.appendChild(errorDiv);
+    renderError(errorDiv, error);
   }
 }
 
 /**
- * Обработка кликов по ссылкам для навигации
- * @param {Event} event - Событие клика
- */
-function handleNavigation(event) {
-  const link = event.target.closest('a');
-  
-  if (!link || !link.href) return;
-  
-  // Проверяем, что это внутренняя ссылка (на текущий сайт)
-  const isSameOrigin = link.href.startsWith(window.location.origin);
-  const hasTarget = link.hasAttribute('target');
-  
-  if (isSameOrigin && !hasTarget) {
-    event.preventDefault();
-    const url = new URL(link.href);
-    navigateTo(url.pathname);
-  }
-}
-
-/**
- * Обновление мета-тегов страницы
+ * Обновляет мета-теги страницы для SEO
  * @param {string} title - Заголовок страницы
  * @param {string} description - Описание страницы
  */
 function updatePageMeta(title, description) {
-  document.title = title ? `${title} | Pavlenko.Tech` : 'Pavlenko.Tech';
+  // Обновляем заголовок
+  document.title = title ? `${title} | Pavlenko.Tech` : 'Технический блог';
   
-  // Обновление мета-описания
-  let metaDescription = document.querySelector('meta[name="description"]');
-  
+  // Обновляем описание
+  const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) {
-    metaDescription.setAttribute('content', description || 'Технический блог Павла Павленко');
+    metaDescription.setAttribute('content', description || 'Технический блог о разработке и технологиях');
   }
 }
 
 /**
- * Обновление активной ссылки в меню
- * @param {string} pathname - Текущий путь
+ * Обновляет активную ссылку в навигации
+ * @param {string} path - Текущий путь
  */
-function updateActiveNavLink(pathname) {
-  const navLinks = document.querySelectorAll('.nav-links a');
+function updateActiveNavLink(path) {
+  // Находим все ссылки в навигации
+  const navLinks = document.querySelectorAll('nav a');
   
+  // Удаляем класс active со всех ссылок
+  navLinks.forEach(link => link.classList.remove('active'));
+  
+  // Определяем активную секцию
+  let activeSection = '';
+  
+  if (path === '/' || path === '') {
+    activeSection = '/';
+  } else if (path.startsWith('/posts/')) {
+    activeSection = '/';
+  } else if (path.startsWith('/tags')) {
+    activeSection = '/tags';
+  } else if (path === '/about') {
+    activeSection = '/about';
+  }
+  
+  // Находим соответствующую ссылку и добавляем класс active
   navLinks.forEach(link => {
-    link.classList.remove('active');
-    
-    const route = link.getAttribute('data-route');
-    
-    if (route === 'home' && (pathname === '/' || pathname === '')) {
-      link.classList.add('active');
-    } else if (route === 'tags' && pathname.startsWith('/tags')) {
-      link.classList.add('active');
-    } else if (route === 'about' && pathname === '/about') {
+    const href = link.getAttribute('href');
+    if (href === activeSection) {
       link.classList.add('active');
     }
   });
 }
 
-/**
- * Очистка кэша и перезагрузка данных
- */
-async function refreshContent() {
-  clearContentCache();
-  await loadAppData();
-  handleRouteChange(state.currentRoute || window.location.pathname);
-}
-
-// Запуск приложения при загрузке страницы
+// Инициализируем приложение при загрузке
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Экспорт для возможного использования в других модулях
-export { state, refreshContent }; 
+export { state }; 

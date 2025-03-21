@@ -29,14 +29,20 @@ npm start
 
 # Обновление индекса статей
 npm run update-index
+
+# Упрощенный деплой
+npm run deploy
 ```
 
 ## Структура системы
 ```
-pavlenko.tech/
+/
 ├── .github/
 │   └── workflows/
-│       └── update-index.yml    # GitHub Actions для обновления индекса
+│       ├── update-index.yml    # GitHub Actions для обновления индекса
+│       └── github-pages.yml    # GitHub Actions для деплоя на GitHub Pages
+├── .cursor/
+│   └── rules/                  # Правила для IDE Cursor
 ├── content/
 │   ├── about/
 │   │   └── index.md            # Информация о блоге/авторе
@@ -51,10 +57,25 @@ pavlenko.tech/
 │   ├── content.js              # Работа с контентом
 │   ├── router.js               # Маршрутизация
 │   └── ui.js                   # Пользовательский интерфейс
+├── images/                     # Изображения для сайта
+├── memory-bank/                # Документация проекта
+│   ├── activeContext.md
+│   ├── productContext.md
+│   ├── progress.md
+│   ├── projectbrief.md
+│   ├── systemPatterns.md
+│   └── techContext.md
 ├── scripts/
 │   └── generate-index.js       # Скрипт для обновления индекса
+├── .gitignore                  # Исключения для Git
+├── .htaccess                   # Правила перенаправления для Apache
+├── .nojekyll                   # Отключение обработки Jekyll для GitHub Pages
+├── 404.html                    # Страница 404
+├── _redirects                  # Правила перенаправления для Netlify
+├── favicon.ico                 # Иконка сайта
 ├── index.html                  # Главная страница (SPA)
-└── package.json                # Зависимости и скрипты
+├── package.json                # Зависимости и скрипты
+└── README.md                   # Документация проекта
 ```
 
 ## Рабочие процессы и инструменты
@@ -62,12 +83,17 @@ pavlenko.tech/
 ### Локальная разработка
 1. Запуск сервера: `npm start`
 2. Обновление индекса: `npm run update-index`
+3. Просмотр в браузере по адресу: `http://localhost:3000`
 
 ### Деплой
-1. Коммит изменений: `git commit -m "Сообщение"`
-2. Пуш изменений: `git push origin master`
-3. GitHub Actions автоматически обновит индекс
-4. GitHub Pages автоматически обновит сайт
+1. Автоматический через GitHub:
+   - Коммит изменений: `git commit -m "Сообщение"`
+   - Пуш изменений: `git push origin master`
+   - GitHub Actions автоматически обновит индекс
+   - GitHub Pages автоматически обновит сайт
+
+2. Упрощенный через npm-скрипт:
+   - `npm run deploy` (объединяет add, commit и push)
 
 ### Обновление контента
 1. Создание/редактирование .md файлов
@@ -78,4 +104,10 @@ pavlenko.tech/
 - Отсутствие серверной обработки (только статические файлы)
 - Все данные должны быть подготовлены заранее или загружены на клиенте
 - Необходимость прямого доступа к файлам .md для чтения их содержимого
-- Ограничения GitHub Pages (только статический контент) 
+- Ограничения GitHub Pages (только статический контент)
+
+## Инструменты разработки
+- Visual Studio Code / Cursor - основной редактор кода
+- Git - система контроля версий
+- npm - менеджер пакетов
+- GitHub - хостинг репозитория и CI/CD 

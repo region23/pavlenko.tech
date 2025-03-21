@@ -19,8 +19,10 @@ function initRouter(handler) {
   
   // Обработка события popstate (перемещение по истории браузера)
   window.addEventListener('popstate', () => {
+    const path = window.location.pathname;
+    console.log(`Навигация по истории: ${path}`);
     if (routeChangeHandler) {
-      routeChangeHandler(window.location.pathname);
+      routeChangeHandler(path);
     }
   });
   
@@ -29,7 +31,45 @@ function initRouter(handler) {
   if (redirectPath) {
     sessionStorage.removeItem('redirectPath');
     window.history.replaceState(null, '', redirectPath);
+    console.log(`Перенаправление на сохраненный путь: ${redirectPath}`);
     routeChangeHandler?.(redirectPath);
+  }
+  
+  // Инициализация обработчика кликов для всего документа
+  document.addEventListener('click', handleNavigation);
+}
+
+/**
+ * Обработка навигации по ссылкам
+ * @param {Event} event - Событие клика
+ */
+function handleNavigation(event) {
+  // Проверяем, что клик был по ссылке
+  const target = event.target.closest('a');
+  if (!target) return;
+  
+  // Получаем href ссылки
+  const href = target.getAttribute('href');
+  
+  // Пропускаем внешние ссылки и ссылки с модификаторами
+  if (!href || 
+      href.startsWith('http') || 
+      href.startsWith('mailto:') || 
+      href.startsWith('tel:') ||
+      target.hasAttribute('download') ||
+      target.getAttribute('target') === '_blank' ||
+      event.ctrlKey || 
+      event.metaKey) {
+    return;
+  }
+  
+  // Предотвращаем стандартное поведение ссылки
+  event.preventDefault();
+  
+  // Если ссылка отличается от текущего пути
+  if (href !== window.location.pathname) {
+    console.log(`Навигация по ссылке: ${href}`);
+    navigateTo(href);
   }
 }
 
@@ -45,6 +85,7 @@ function navigateTo(pathname) {
   
   // Добавляем новое состояние в историю браузера
   window.history.pushState(null, '', pathname);
+  console.log(`Переход на: ${pathname}`);
   
   // Вызываем обработчик для обновления контента
   routeChangeHandler?.(pathname);
@@ -79,5 +120,6 @@ export {
   initRouter, 
   navigateTo, 
   getUrlParams, 
-  getCurrentRoute 
+  getCurrentRoute,
+  handleNavigation
 }; 

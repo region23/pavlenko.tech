@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; connect-src 'self' localhost:*; font-src 'self' data:;">
   <base href="/">
   <title>Технический блог</title>
   <meta name="description" content="Технический блог о разработке и технологиях">
   <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
   <!-- Скрипт для корректной работы маршрутизации при перезагрузке страницы -->
   <script>
     // Перенаправляем все запросы на index.html
@@ -26,21 +29,24 @@
             !path.includes('.')) {
           
           // Сохраняем путь в sessionStorage для восстановления после перенаправления
-          sessionStorage.setItem('redirectPath', path);
+          try {
+            sessionStorage.setItem('redirectPath', path);
+          } catch (e) {
+            console.error('Ошибка при сохранении пути:', e);
+          }
         }
       }
     })();
   </script>
-</head>
-<body>
+
   <header>
     <div class="container">
       <nav>
         <a href="/" class="logo">Pavlenko.Tech</a>
         <ul class="nav-links">
-          <li><a href="/" data-route="home">Блог</a></li>
-          <li><a href="/tags" data-route="tags">Теги</a></li>
-          <li><a href="/about" data-route="about">Обо мне</a></li>
+          <li><a href="/" class="active">Блог</a></li>
+          <li><a href="/tags">Теги</a></li>
+          <li><a href="/about">Обо мне</a></li>
         </ul>
       </nav>
     </div>
@@ -48,9 +54,9 @@
 
   <main>
     <div class="container">
-      <div id="content" class="content">
-        <!-- Контент будет загружен динамически -->
-        <div class="loader">Загрузка...</div>
+      <div id="error-container"></div>
+      <div id="content">
+        <div class="loading">Загрузка...</div>
       </div>
     </div>
   </main>

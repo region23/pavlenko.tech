@@ -37,7 +37,7 @@ console.log(greet('мир'));
 
 Ссылки [работают так](https://example.com), а изображения вставляются следующим образом:
 
-![Пример изображения](https://via.placeholder.com/600x400)
+![Пример изображения](/images/placeholder.svg)
 
 ## Заключение
 

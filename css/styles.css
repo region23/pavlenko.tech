@@ -1,0 +1,101 @@
+/* Стили для изображений в контенте */
+.content-image {
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 1rem 0;
+}
+
+.content-image:hover {
+    transform: scale(1.02);
+}
+
+.placeholder-image {
+    border: 1px dashed #ccc;
+    background-color: #f9f9f9;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: not-allowed;
+}
+
+/* Стили для модального окна с изображением */
+.image-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.image-modal-content {
+    max-width: 90%;
+    max-height: 85%;
+    margin-bottom: 10px;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1010;
+}
+
+.image-modal-caption {
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    max-width: 80%;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.image-error-message {
+    color: #ff5555;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px 15px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+}
+
+/* Стили для адаптивности модального окна на мобильных устройствах */
+@media screen and (max-width: 768px) {
+    .image-modal-content {
+        width: 95%;
+    }
+    
+    .image-modal-close {
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+    }
+    
+    .image-modal-caption {
+        font-size: 14px;
+        padding: 5px;
+    }
+} 
