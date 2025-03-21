@@ -15,7 +15,7 @@ const readDirAsync = promisify(fs.readdir);
 const statAsync = promisify(fs.stat);
 
 // Путь к директории с постами
-const POSTS_DIR = path.join(__dirname, '../content/posts');
+const POSTS_DIR = path.join(__dirname, 'content/posts');
 // Путь к файлу индекса
 const INDEX_FILE = path.join(POSTS_DIR, 'index.json');
 

@@ -4,7 +4,7 @@
   "description": "Технический блог на Markdown",
   "private": true,
   "scripts": {
-    "start": "npx serve -s pavlenko.tech",
+    "start": "npx serve -s",
     "update-index": "node scripts/generate-index.js",
     "deploy": "git add . && git commit -m 'Update content' && git push"
   },

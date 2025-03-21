@@ -1,6 +1,5 @@
 /**
- * Модуль для маршрутизации с использованием History API
- * Обеспечивает навигацию между страницами без полной перезагрузки
+ * Простой клиентский роутер с использованием History API
  */
 
 // Функция обработки маршрута, будет установлена при инициализации
@@ -19,28 +18,18 @@ function initRouter(handler) {
   routeChangeHandler = handler;
   
   // Обработка события popstate (перемещение по истории браузера)
-  window.addEventListener('popstate', (event) => {
-    handlePopState();
+  window.addEventListener('popstate', () => {
+    if (routeChangeHandler) {
+      routeChangeHandler(window.location.pathname);
+    }
   });
-  
-  // Создаем начальное состояние истории, если его еще нет
-  if (!window.history.state) {
-    const pathname = window.location.pathname;
-    window.history.replaceState({ pathname }, document.title, pathname);
-  }
   
   // Проверяем, был ли сохранен путь после перезагрузки страницы
   const redirectPath = sessionStorage.getItem('redirectPath');
   if (redirectPath) {
-    // Удаляем сохраненный путь
     sessionStorage.removeItem('redirectPath');
-    // Заменяем состояние истории без добавления новой записи
-    window.history.replaceState({ pathname: redirectPath }, '', redirectPath);
-    // Вызываем обработчик для обновления контента
-    if (routeChangeHandler) {
-      routeChangeHandler(redirectPath);
-      return; // Выходим, чтобы избежать двойного вызова для текущего URL
-    }
+    window.history.replaceState(null, '', redirectPath);
+    routeChangeHandler?.(redirectPath);
   }
 }
 
@@ -55,23 +44,10 @@ function navigateTo(pathname) {
   }
   
   // Добавляем новое состояние в историю браузера
-  window.history.pushState({ pathname }, '', pathname);
+  window.history.pushState(null, '', pathname);
   
   // Вызываем обработчик для обновления контента
-  if (routeChangeHandler) {
-    routeChangeHandler(pathname);
-  }
-}
-
-/**
- * Обработка события popstate (когда пользователь нажимает кнопки браузера назад/вперед)
- */
-function handlePopState() {
-  const pathname = window.location.pathname;
-  
-  if (routeChangeHandler) {
-    routeChangeHandler(pathname);
-  }
+  routeChangeHandler?.(pathname);
 }
 
 /**
