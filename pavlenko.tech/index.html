@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/">
+  <title>Технический блог</title>
+  <meta name="description" content="Технический блог о разработке и технологиях">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Скрипт для корректной работы маршрутизации при перезагрузке страницы -->
+  <script>
+    // Перенаправляем все запросы на index.html
+    (function() {
+      // Проверяем, не загружена ли страница через file:// протокол
+      if (window.location.protocol !== 'file:') {
+        // Получаем текущий путь из URL
+        const path = window.location.pathname;
+        
+        // Если путь не корневой и не является фактическим файлом
+        if (path !== '/' && 
+            !path.endsWith('.html') && 
+            !path.endsWith('.js') && 
+            !path.endsWith('.css') && 
+            !path.endsWith('.json') && 
+            !path.endsWith('.md') && 
+            !path.includes('.')) {
+          
+          // Сохраняем путь в sessionStorage для восстановления после перенаправления
+          sessionStorage.setItem('redirectPath', path);
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="logo">Pavlenko.tech</a>
+        <ul class="nav-links">
+          <li><a href="/" data-route="home">Блог</a></li>
+          <li><a href="/tags" data-route="tags">Теги</a></li>
+          <li><a href="/about" data-route="about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div id="content" class="content">
+        <!-- Контент будет загружен динамически -->
+        <div class="loader">Загрузка...</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2024 Pavlenko.tech</p>
+    </div>
+  </footer>
+
+  <!-- Основной скрипт приложения -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html> 

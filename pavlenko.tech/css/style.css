@@ -1,0 +1,261 @@
+:root {
+  --primary-color: #333;
+  --secondary-color: #666;
+  --accent-color: #0070f3;
+  --background-color: #fff;
+  --surface-color: #f9f9f9;
+  --text-color: #333;
+  --border-color: #eaeaea;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Базовые стили */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 18px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Типографика */
+h1, h2, h3, h4, h5, h6 {
+  margin: 2.5rem 0 1.5rem;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.8rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 1.5rem;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Хедер и навигация */
+header {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 1.5rem;
+}
+
+.nav-links a {
+  color: var(--secondary-color);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary-color);
+}
+
+/* Контент */
+.content {
+  min-height: 65vh;
+  margin-bottom: 3rem;
+}
+
+/* Список статей */
+.post-list {
+  list-style: none;
+}
+
+.post-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.post-item:last-child {
+  border-bottom: none;
+}
+
+.post-title {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-meta {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-summary {
+  margin-bottom: 0.75rem;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  background-color: var(--surface-color);
+  border-radius: 3px;
+  color: var(--secondary-color);
+}
+
+.tag:hover {
+  background-color: var(--border-color);
+  text-decoration: none;
+}
+
+/* Статья */
+.post-content {
+  line-height: 1.7;
+}
+
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 5px;
+}
+
+.post-content pre {
+  background-color: var(--surface-color);
+  padding: 1rem;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.post-content code {
+  background-color: var(--surface-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.post-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.post-content blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--border-color);
+  color: var(--secondary-color);
+}
+
+/* Страница about */
+.about-content {
+  max-width: 700px;
+}
+
+/* Теги */
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+/* Футер */
+footer {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border-color);
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+}
+
+/* Загрузка */
+.loader {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--secondary-color);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nav-links {
+    margin-top: 1rem;
+  }
+  
+  .nav-links li:first-child {
+    margin-left: 0;
+  }
+} 

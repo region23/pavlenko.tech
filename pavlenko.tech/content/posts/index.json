@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Пример статьи в блоге",
+    "date": "2024-05-01",
+    "tags": ["javascript", "web"],
+    "summary": "Это пример первой статьи в блоге для демонстрации функционала.",
+    "slug": "hello-world",
+    "file": "hello-world"
+  },
+  {
+    "title": "Вторая статья для примера",
+    "date": "2024-04-20",
+    "tags": ["markdown", "tutorial"],
+    "summary": "Демонстрация возможностей Markdown и структуры статей.",
+    "slug": "example-post",
+    "file": "example-post"
+  }
+] 

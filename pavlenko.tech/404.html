@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Перенаправление</title>
+  <script>
+    // Сохраняем текущий путь
+    const path = window.location.pathname;
+    
+    // Мы хотим перенаправить на index.html, но сохранить текущий путь для SPA-маршрутизации
+    sessionStorage.setItem('redirectPath', path);
+    
+    // Перенаправляем на главную страницу
+    window.location.href = '/';
+  </script>
+</head>
+<body>
+  <h1>Перенаправление...</h1>
+  <p>Если перенаправление не работает, <a href="/">перейдите на главную страницу</a>.</p>
+</body>
+</html> 

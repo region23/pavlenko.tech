@@ -1,0 +1,21 @@
+{
+  "name": "pavlenko-tech-blog",
+  "version": "1.0.0",
+  "description": "Технический блог на Markdown",
+  "private": true,
+  "scripts": {
+    "start": "npx serve -s pavlenko.tech",
+    "update-index": "node scripts/generate-index.js",
+    "deploy": "git add . && git commit -m 'Update content' && git push"
+  },
+  "keywords": [
+    "blog",
+    "markdown",
+    "static-site"
+  ],
+  "author": "Pavlenko",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+} 

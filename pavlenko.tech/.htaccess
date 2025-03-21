@@ -1,0 +1,9 @@
+# Включаем модуль mod_rewrite
+RewriteEngine On
+
+# Если запрашиваемый файл или директория не существуют
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Перенаправляем все запросы на index.html
+RewriteRule ^ index.html [L] 
