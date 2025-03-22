@@ -2,8 +2,7 @@ name: Update Content
 
 on:
   push:
-    branches:
-      - master
+    branches: [ main, master ]
     paths:
       - 'content/posts/**.md'  # Запускать только когда изменяются markdown файлы в posts
       - 'js/ui.js'            # Или когда изменяются шаблоны отображения
