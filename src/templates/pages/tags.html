@@ -1,0 +1,12 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+  <div class="tags-page">
+    <h1 class="page-title">Теги</h1>
+    <div class="tags-cloud">
+      {% for tagItem in tagsList %}
+        <a href="/tags/{{ tagItem.tag }}" class="tag-cloud-item">{{ tagItem.tag }} <span>({{ tagItem.count }})</span></a>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %} 

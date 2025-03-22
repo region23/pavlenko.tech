@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: http:; connect-src 'self' localhost:*;">
-  <title>Getting Started with Static Blog Development | Pavlenko.Tech</title>
-  <meta name="description" content="An introduction to creating your own static blog with JavaScript and Markdown.">
-  <link rel="canonical" href="https://pavlenko.tech/posts/hello-world">
-  
+  <title>Hello World | My Static Blog</title>
+  <meta name="description" content="A blog generated with a custom static site generator">
   <!-- Fonts and styles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,144 +14,77 @@
 </head>
 <body>
   <header>
-    <div class="container">
-      <nav>
-        <div class="logo-container">
-          <a href="/" class="logo">Pavlenko.Tech</a>
-          <span class="site-description">Авторский блог Павла Павленко про разработку и AI</span>
-        </div>
-        <ul class="nav-links">
-          
-            <li><a href="/">Блог</a></li>
-          
-            <li><a href="/tags">Теги</a></li>
-          
-            <li><a href="/about">О блоге</a></li>
-          
-        </ul>
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun-icon">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon" style="display:none;">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-      </nav>
-    </div>
-  </header>
-
+  <div class="container">
+    <nav>
+      <div class="logo-container">
+        <a href="/" class="logo">Hello World</a>
+        <span class="site-description">A blog generated with a custom static site generator</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/tags/">Tags</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark theme">
+        <span class="theme-toggle-icon">🌙</span>
+      </button>
+    </nav>
+  </div>
+</header> 
   <main>
     <div class="container">
-      
-    <article class="post">
-      <header class="post-header">
-        <h1>Getting Started with Static Blog Development</h1>
-        <div class="post-meta">
-          <time datetime="2024-05-01">1 мая 2024 г.</time>
-          <span class="post-author">автор: Pavel Pavlenko</span>
-          <span class="reading-time">2 мин. чтения</span>
+<article class="post">
+  <div class="container">
+    <header class="post-header">
+      <h1 class="post-title">Hello World</h1>
+      <div class="post-meta">
+        <time datetime="March 22, 2024">March 22, 2024</time>
+          <span class="post-author">by Test Author</span>
+          <span class="post-reading-time">1 min read</span>
+      </div>
+        <div class="post-tags">
         </div>
-        
-      <div class="post-tags">
-        <a href="/tags/JavaScript" class="tag">JavaScript</a><a href="/tags/Web" class="tag">Web</a><a href="/tags/Markdown" class="tag">Markdown</a>
-      </div>
-    
-      </header>
-      
-      <div class="table-of-contents">
-<h3>Содержание</h3>
+    </header>
+    <div class="post-content">
+      <h1 id="hello-world">Hello World</h1>
+<p>This is a test post to verify that our static site generator is working correctly.</p>
+<h2 id="features-to-test">Features to test</h2>
 <ul>
-<li ><a href="#the-power-of-markdown">The Power of Markdown</a></li>
-<li style="margin-left: 1rem;"><a href="#code-blocks-with-syntax-highlighting">Code Blocks with Syntax Highlighting</a></li>
-<li style="margin-left: 1rem;"><a href="#blockquotes-for-highlighting-important-information">Blockquotes for Highlighting Important Information</a></li>
-<li ><a href="#setting-up-your-project-structure">Setting Up Your Project Structure</a></li>
-<li style="margin-left: 1rem;"><a href="#key-files-to-create">Key Files to Create</a></li>
-<li ><a href="#adding-images-and-links">Adding Images and Links</a></li>
-<li ><a href="#javascript-for-dynamic-content">JavaScript for Dynamic Content</a></li>
-<li ><a href="#conclusion">Conclusion</a></li>
+<li>Markdown rendering</li>
+<li>Code snippets</li>
+<li>Images and links</li>
 </ul>
-</div>
-      
-      <div class="post-content">
-        <h1 id="getting-started-with-static-blog-development">Getting Started with Static Blog Development</h1>
-<p>Welcome to my tech blog! This article will guide you through the process of creating a modern static blog using JavaScript and Markdown.</p>
-<h2 id="the-power-of-markdown">The Power of Markdown</h2>
-<p>Markdown makes content creation simple and efficient:</p>
-<ul>
-<li><strong>Bold text</strong> for emphasis</li>
-<li><em>Italic text</em> for subtle highlights</li>
-<li><del>Strikethrough</del> for outdated information</li>
-</ul>
-<h3 id="code-blocks-with-syntax-highlighting">Code Blocks with Syntax Highlighting</h3>
-<pre><code class="language-text">[object Object]</code></pre><h3 id="blockquotes-for-highlighting-important-information">Blockquotes for Highlighting Important Information</h3>
-<blockquote>
-<p>Static blogs offer exceptional performance, security, and simplicity.<br>They&#8217;re perfect for developers who want complete control over their content.</p>
-</blockquote>
-<h2 id="setting-up-your-project-structure">Setting Up Your Project Structure</h2>
-<p>A well-organized project structure makes development and maintenance easier:</p>
-<ol>
-<li>Create your base directory: <code>mkdir static-blog</code></li>
-<li>Set up essential folders:<ul>
-<li><code>content/</code> - For your Markdown files</li>
-<li><code>js/</code> - For JavaScript modules</li>
-<li><code>css/</code> - For styling</li>
-<li><code>images/</code> - For media files</li>
-</ul>
-</li>
-</ol>
-<h3 id="key-files-to-create">Key Files to Create</h3>
-<ul>
-<li><code>index.html</code> - Main entry point</li>
-<li><code>js/app.js</code> - Core application logic</li>
-<li><code>js/router.js</code> - Client-side routing</li>
-<li><code>css/style.css</code> - Styling</li>
-</ul>
-<h2 id="adding-images-and-links">Adding Images and Links</h2>
-<p>Links <a href="[object Object]">undefined</a>, and images can be easily embedded:</p>
-<p><figure><img src="[object Object]" alt=""><figcaption></figcaption></figure></p>
-<h2 id="javascript-for-dynamic-content">JavaScript for Dynamic Content</h2>
-<p>The beauty of a static blog is using JavaScript to dynamically render content:</p>
-<pre><code class="language-text">[object Object]</code></pre><h2 id="conclusion">Conclusion</h2>
-<p>This simple example demonstrates how you can create a modern static blog with JavaScript and Markdown. The approach gives you complete control over your content while maintaining excellent performance and security.</p>
-<p>In subsequent posts, we&#8217;ll explore more advanced techniques for enhancing your static blog. </p>
-
+<pre><code class="language-text">[object Object]</code></pre><p>Check out <a href="[object Object]">undefined</a> for more information. </p>
+    </div>
+    <footer class="post-footer">
+      <div class="post-sharing">
+        <span>Share this post:</span>
+        <a href="https://twitter.com/intent/tweet?url=example.com/posts/hello-world&text=Hello World" target="_blank" rel="noopener noreferrer" class="share-twitter">Twitter</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=example.com/posts/hello-world" target="_blank" rel="noopener noreferrer" class="share-facebook">Facebook</a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=example.com/posts/hello-world&title=Hello World" target="_blank" rel="noopener noreferrer" class="share-linkedin">LinkedIn</a>
       </div>
-      
-      <div class="social-share">
-        <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fpavlenko.tech%2Fposts%2Fhello-world&text=Getting%20Started%20with%20Static%20Blog%20Development" class="social-button twitter-share" target="_blank" rel="noopener">Поделиться в Twitter</a>
-        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpavlenko.tech%2Fposts%2Fhello-world" class="social-button linkedin-share" target="_blank" rel="noopener">Поделиться в LinkedIn</a>
-        <a href="https://t.me/share/url?url=https%3A%2F%2Fpavlenko.tech%2Fposts%2Fhello-world&text=Getting%20Started%20with%20Static%20Blog%20Development" class="social-button telegram-share" target="_blank" rel="noopener">Поделиться в Telegram</a>
+      <div class="post-navigation">
+          <a href="/posts/example-post" class="next-post">
+            Next Post &rarr;
+            <span>Advanced Markdown Techniques for Developers</span>
+          </a>
       </div>
-    </article>
-  
+    </footer>
+  </div>
+</article>
     </div>
   </main>
-
   <footer>
-    <div class="container">
-      <p>© 2025 Pavlenko.Tech</p>
-      <div class="footer-links">
-        
-          <a href="https://github.com/pavlenko" target="_blank" rel="noopener noreferrer">GitHub</a>
-        
-          <a href="https://twitter.com/pavlenko" target="_blank" rel="noopener noreferrer">Twitter</a>
-        
-          <a href="https://linkedin.com/in/pavlenko" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        
-      </div>
+  <div class="container">
+    <p>&copy; 2024 Hello World</p>
+    <div class="footer-links">
+      <a href="https://github.com/pavlenko" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://twitter.com/pavlenko" target="_blank" rel="noopener noreferrer">Twitter</a>
+      <a href="https://linkedin.com/in/pavlenko" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     </div>
-  </footer>
-
+  </div>
+</footer> 
   <!-- Minimal JavaScript for theme toggle and pagination -->
   <script src="/js/theme.js"></script>
 </body>
-</html>
+</html> 

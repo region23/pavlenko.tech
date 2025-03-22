@@ -1,18 +1,23 @@
 # Static Blog Generator
 
-A modern, lightweight static blog with a powerful configuration system, allowing customization without editing code.
+A modern, lightweight static blog with a powerful configuration system and hybrid rendering approach. Supports both client-side SPA (Single Page Application) and static HTML generation for improved SEO and Telegram Instant View compatibility.
 
 ## Features
 
 - Fully configurable through a single `config.json` file
+- Hybrid rendering: SPA for users, static HTML for bots and SEO
+- Custom template engine with variables, conditionals, loops, and template inheritance
+- Automatic post-processing of HTML to clean up unprocessed template tags
 - Static site generation for fast loading and best SEO practices
 - Responsive design for mobile and desktop
 - Dark mode support
-- Tag-based categorization
-- Markdown content with code highlighting
+- Tag-based categorization with dedicated tag pages
+- Markdown content with code highlighting and typographic improvements
+- Table of contents generation from article headings
 - Automatic reading time calculation
 - Configurable appearance (colors, fonts, etc.)
 - Automatic pagination based on config settings
+- Telegram Instant View 2.1 integration
 - Sitemap.xml generation for better SEO
 - Lightning-fast performance with minimal JavaScript
 
@@ -30,7 +35,7 @@ A modern, lightweight static blog with a powerful configuration system, allowing
 - `npm run start` - Serve the generated static site locally
 - `npm run dev` - Generate the site and serve it locally for development
 - `npm run update-index` - Update the post index file
-- `npm run generate-static` - Generate the static site
+- `npm run generate-static` - Generate the static site using the site-generator.js
 - `npm run build` - Update the index and generate the static site
 - `npm run deploy` - Build, commit and push to GitHub (triggers automatic deployment)
 
@@ -147,19 +152,54 @@ Your post content in Markdown format...
 
 ## How It Works
 
-This blog now uses a static site generation approach:
+This blog uses a hybrid approach combining SPA and static site generation:
 
 1. All content is written in Markdown with frontmatter
-2. The static generator processes Markdown content and generates HTML files
+2. The static generator processes Markdown content and generates HTML files using:
+   - A custom template engine that handles variables, conditions, loops, and template inheritance
+   - Marked 15.x with extensions (smartypants for typography, gfm-heading-id for heading anchors)
+   - Post-processing to clean up any unprocessed template tags
 3. Pagination is pre-rendered based on the `postsPerPage` setting in the config
-4. A minimal amount of JavaScript is included for:
-   - Dark mode toggle
-   - Optional interactive elements
-5. All pages are generated as static HTML, resulting in:
-   - Faster page loads
-   - Better SEO
-   - Improved security
-   - Lower hosting costs
+4. HTML pages are generated for:
+   - Individual posts
+   - Home page with paginated post lists
+   - Tag pages with filtered post lists
+   - About and 404 pages
+5. The `.htaccess` file intelligently routes search engines and bots to static HTML versions
+6. For regular users, the SPA version provides a smooth experience with client-side routing
+7. Telegram Instant View is supported through a custom IV 2.1 template
+
+## Template Engine
+
+The blog uses a custom template engine with the following features:
+
+- Template variables: `{{ variable }}`
+- Conditional statements: `{% if condition %}...{% else %}...{% endif %}`
+- Loops: `{% for item in items %}...{% endfor %}`
+- Template inclusion: `{% include "partial.html" %}`
+- Template inheritance: `{% extends "layout.html" %}`
+- Safe property access to prevent errors with undefined variables
+
+## Directory Structure
+
+```
+/
+├── content/             # Content files in Markdown
+├── css/                 # CSS stylesheets
+├── dist/                # Generated static site
+├── js/                  # Client-side JavaScript
+├── scripts/             # Build scripts
+├── src/
+│   ├── engine/          # Static site generator components
+│   │   ├── template.js  # Template engine
+│   │   └── content.js   # Content processor
+│   └── templates/       # HTML templates
+│       ├── layouts/     # Base layouts
+│       ├── pages/       # Page templates
+│       └── partials/    # Reusable components
+├── static/              # Static assets
+└── config.json          # Site configuration
+```
 
 ## Automated Deployment
 
@@ -171,13 +211,42 @@ The blog includes GitHub Actions configuration for automatic deployment:
 
 You can customize the deployment in the `.github/workflows/build-deploy.yml` file.
 
+## Telegram Instant View
+
+The blog includes a custom Telegram Instant View 2.1 template that works with both the SPA and static HTML versions. To test the template:
+
+1. Upload the `telegram-iv-template.txt` file to the [Telegram IV Platform](https://instantview.telegram.org/)
+2. Test it against your blog posts
+3. Submit for approval when ready
+
+## Known Limitations
+
+- Template conditions with undefined variables may generate errors in the console (these are handled by post-processing)
+- All static HTML files need to be regenerated when templates are modified
+- Certain complex elements (iframe, canvas) are not fully supported in Telegram Instant View
+
+## Roadmap
+
+Upcoming features and improvements:
+
+- Full overhaul of template condition handling to eliminate undefined variable errors
+- Integration with Google Analytics (optional via config)
+- Improved SEO with sitemap.xml and robots.txt
+- Comment system integration (Disqus, Utterances)
+- Admin panel for visual configuration editing
+- Enhanced image optimization
+- Expanded Markdown capabilities with custom components
+- Automatic TOC generation from article headings
+- Multi-language UI support
+
 ## Customization
 
 For advanced customization beyond the configuration file, you can:
 
 1. Edit the CSS in `css/style.css`
-2. Modify the static site generator in `scripts/static-site-generator.js`
-3. Update the JavaScript in the `js` folder
+2. Modify the static site generator in `scripts/site-generator.js`
+3. Update the templates in the `src/templates` directory
+4. Extend the template engine in `src/engine/template.js`
 
 ## License
 

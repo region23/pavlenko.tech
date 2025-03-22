@@ -1,121 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://pavlenko.tech/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
+    <loc>https://example.com/posts/lalala-copy</loc>
+    <lastmod>2025-03-22T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/page/2</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <loc>https://example.com/posts/lalala</loc>
+    <lastmod>2025-03-22T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/page/3</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <loc>https://example.com/posts/latutut-copy-2</loc>
+    <lastmod>2025-03-21T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/posts/latutut-copy</loc>
+    <lastmod>2025-03-21T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://example.com/posts/latutut</loc>
+    <lastmod>2025-03-21T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Markdown</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/posts/modern-ai-development</loc>
+    <lastmod>2025-03-15T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Tutorial</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/posts/example-post</loc>
+    <lastmod>2024-04-20T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Documentation</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/posts/hello-world</loc>
+    <lastmod>2024-03-22T00:00:00.000Z</lastmod>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/AI</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Development</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/tags/markdown</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Best Practices</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/tags/tutorial</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Architecture</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/tags/documentation</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/JavaScript</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/tags/test</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/tags/Web</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://example.com/tags/hello</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/lalala copy</loc>
-    <lastmod>2025-03-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/tags/ai</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/lalala</loc>
-    <lastmod>2025-03-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/tags/development</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/latutut copy 2</loc>
-    <lastmod>2025-03-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/tags/best-practices</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/latutut copy</loc>
-    <lastmod>2025-03-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/tags/architecture</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/latutut</loc>
-    <lastmod>2025-03-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/tags</loc>
   </url>
   <url>
-    <loc>https://pavlenko.tech/posts/modern-ai-development</loc>
-    <lastmod>2025-03-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://pavlenko.tech/posts/hello-world</loc>
-    <lastmod>2024-05-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://pavlenko.tech/posts/example-post</loc>
-    <lastmod>2024-04-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://example.com/about</loc>
   </url>
 </urlset>

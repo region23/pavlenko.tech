@@ -1,50 +1,8 @@
 {
-  "site": {
-    "title": "Pavlenko.Tech",
-    "description": "Авторский блог Павла Павленко про разработку и AI",
-    "language": "ru",
-    "copyright": "© 2025 Pavlenko.Tech"
-  },
-  "navigation": {
-    "items": [
-      {"label": "Блог", "url": "/", "active": true},
-      {"label": "Теги", "url": "/tags"},
-      {"label": "О блоге", "url": "/about"}
-    ]
-  },
-  "social": {
-    "links": [
-      {"platform": "GitHub", "url": "https://github.com/pavlenko"},
-      {"platform": "Twitter", "url": "https://twitter.com/pavlenko"},
-      {"platform": "LinkedIn", "url": "https://linkedin.com/in/pavlenko"}
-    ]
-  },
-  "appearance": {
-    "colors": {
-      "primary": "#18181b",
-      "secondary": "#64748b",
-      "accent": "#3b82f6",
-      "background": "#fafafa",
-      "surface": "#ffffff",
-      "text": "#1e293b",
-      "border": "#e2e8f0"
-    },
-    "darkMode": {
-      "background": "#121212",
-      "surface": "#1e1e1e",
-      "text": "#e2e8f0",
-      "secondary": "#94a3b8",
-      "border": "#2d3748"
-    },
-    "fonts": {
-      "main": "Inter",
-      "code": "JetBrains Mono"
-    }
-  },
-  "content": {
-    "postsPerPage": 3,
-    "showReadingTime": true,
-    "defaultAuthor": "Pavel Pavlenko",
-    "wordsPerMinute": 200
-  }
+  "title": "My Static Blog",
+  "description": "A blog generated with a custom static site generator",
+  "hostname": "example.com",
+  "language": "en",
+  "postsPerPage": 10,
+  "defaultAuthor": "Default Author"
 } 
