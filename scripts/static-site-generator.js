@@ -384,7 +384,7 @@ function createTableOfContents(headings) {
   }
   
   let tocHtml = '<div class="table-of-contents">\n';
-  tocHtml += '<h3>Table of Contents</h3>\n';
+  tocHtml += '<h3>Содержание</h3>\n';
   tocHtml += '<ul>\n';
   
   headings.forEach(heading => {
@@ -426,8 +426,8 @@ function generatePostHtml(post) {
         <h1>${title}</h1>
         <div class="post-meta">
           <time datetime="${date}">${formattedDate}</time>
-          ${postAuthor ? `<span class="post-author">by ${postAuthor}</span>` : ''}
-          ${readingTime ? `<span class="reading-time">${readingTime} min read</span>` : ''}
+          ${postAuthor ? `<span class="post-author">автор: ${postAuthor}</span>` : ''}
+          ${readingTime ? `<span class="reading-time">${readingTime} мин. чтения</span>` : ''}
         </div>
         ${tagsHtml}
       </header>
@@ -439,9 +439,9 @@ function generatePostHtml(post) {
       </div>
       
       <div class="social-share">
-        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}&text=${encodeURIComponent(title)}" class="social-button twitter-share" target="_blank" rel="noopener">Share on Twitter</a>
-        <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}" class="social-button linkedin-share" target="_blank" rel="noopener">Share on LinkedIn</a>
-        <a href="https://t.me/share/url?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}&text=${encodeURIComponent(title)}" class="social-button telegram-share" target="_blank" rel="noopener">Share on Telegram</a>
+        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}&text=${encodeURIComponent(title)}" class="social-button twitter-share" target="_blank" rel="noopener">Поделиться в Twitter</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}" class="social-button linkedin-share" target="_blank" rel="noopener">Поделиться в LinkedIn</a>
+        <a href="https://t.me/share/url?url=${encodeURIComponent(`https://${config.site.hostname || 'pavlenko.tech'}/posts/${post.slug || post.file}`)}&text=${encodeURIComponent(title)}" class="social-button telegram-share" target="_blank" rel="noopener">Поделиться в Telegram</a>
       </div>
     </article>
   `;
@@ -465,9 +465,9 @@ function generatePaginationControls(page) {
   
   return `
     <div class="pagination">
-      ${page.hasPrev ? `<a href="${page.prevUrl}" class="pagination-prev">← Previous</a>` : '<span class="pagination-prev disabled">← Previous</span>'}
-      <span class="pagination-info">Page ${page.number} of ${page.total}</span>
-      ${page.hasNext ? `<a href="${page.nextUrl}" class="pagination-next">Next →</a>` : '<span class="pagination-next disabled">Next →</span>'}
+      ${page.hasPrev ? `<a href="${page.prevUrl}" class="pagination-prev">← Предыдущая</a>` : '<span class="pagination-prev disabled">← Предыдущая</span>'}
+      <span class="pagination-info">Страница ${page.number} из ${page.total}</span>
+      ${page.hasNext ? `<a href="${page.nextUrl}" class="pagination-next">Следующая →</a>` : '<span class="pagination-next disabled">Следующая →</span>'}
     </div>
   `;
 }
@@ -496,9 +496,9 @@ function generatePostListHtml(page) {
         <h2 class="post-title"><a href="/posts/${post.slug || post.file}">${post.title}</a></h2>
         <div class="post-meta">
           <time datetime="${post.date}">${formattedDate}</time>
-          ${post.author ? `<span class="post-author">by ${post.author}</span>` : ''}
+          ${post.author ? `<span class="post-author">автор: ${post.author}</span>` : ''}
           ${calculateReadingTime(post.content || '', config.content.wordsPerMinute) ? 
-            `<span class="reading-time">${calculateReadingTime(post.content || '', config.content.wordsPerMinute)} min read</span>` : ''}
+            `<span class="reading-time">${calculateReadingTime(post.content || '', config.content.wordsPerMinute)} мин. чтения</span>` : ''}
         </div>
         <p class="post-summary">${post.summary || ''}</p>
         ${tagsHtml}
@@ -508,7 +508,7 @@ function generatePostListHtml(page) {
   
   const paginationControls = generatePaginationControls(page);
   const content = `
-    <h1>${page.number > 1 ? `Posts - Page ${page.number}` : 'Latest Posts'}</h1>
+    <h1>${page.number > 1 ? `Записи - Страница ${page.number}` : 'Последние записи'}</h1>
     <ul class="post-list">
       ${postsHtml}
     </ul>
@@ -535,9 +535,9 @@ function generateTagPageHtml(tag, posts) {
         <h2 class="post-title"><a href="/posts/${post.slug || post.file}">${post.title}</a></h2>
         <div class="post-meta">
           <time datetime="${post.date}">${formattedDate}</time>
-          ${post.author ? `<span class="post-author">by ${post.author}</span>` : ''}
+          ${post.author ? `<span class="post-author">автор: ${post.author}</span>` : ''}
           ${calculateReadingTime(post.content || '', config.content.wordsPerMinute) ? 
-            `<span class="reading-time">${calculateReadingTime(post.content || '', config.content.wordsPerMinute)} min read</span>` : ''}
+            `<span class="reading-time">${calculateReadingTime(post.content || '', config.content.wordsPerMinute)} мин. чтения</span>` : ''}
         </div>
         <p class="post-summary">${post.summary || ''}</p>
       </li>
@@ -545,19 +545,19 @@ function generateTagPageHtml(tag, posts) {
   }).join('');
   
   const content = `
-    <h1>Posts tagged with "${tag}"</h1>
+    <h1>Записи с тегом "${tag}"</h1>
     <ul class="post-list">
-      ${posts.length > 0 ? postsHtml : '<p>No posts found with this tag.</p>'}
+      ${posts.length > 0 ? postsHtml : '<p>Записи с этим тегом не найдены.</p>'}
     </ul>
     <div class="back-link">
-      <a href="/tags">← All Tags</a>
+      <a href="/tags">← Все теги</a>
     </div>
   `;
   
   return generateBaseHtml(
-    `Tag: ${tag}`, 
+    `Тег: ${tag}`, 
     content, 
-    `Posts tagged with ${tag}`, 
+    `Записи с тегом ${tag}`, 
     `/tags/${tag}`
   );
 }
@@ -585,7 +585,7 @@ function generateTagsListHtml(tagCounts) {
     </div>
   `;
   
-  return generateBaseHtml('Tags', content, 'Browse all tags', '/tags');
+  return generateBaseHtml('Теги', content, 'Просмотр всех тегов', '/tags');
 }
 
 /**
@@ -618,13 +618,13 @@ function generate404Html() {
   const content = `
     <div class="error-page">
       <h1>404</h1>
-      <h2>Page Not Found</h2>
-      <p>The page you are looking for doesn't exist or has been moved.</p>
-      <a href="/" class="button">Go Home</a>
+      <h2>Страница не найдена</h2>
+      <p>Страница, которую вы ищете, не существует или была перемещена.</p>
+      <a href="/" class="button">На главную</a>
     </div>
   `;
   
-  return generateBaseHtml('404 Not Found', content);
+  return generateBaseHtml('Страница не найдена', content);
 }
 
 /**
