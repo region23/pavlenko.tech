@@ -1,6 +1,6 @@
 # Telegram Instant View Integration
 
-This guide explains how to set up [Telegram Instant View](https://instantview.telegram.org/) for your blog. Instant View allows Telegram users to read your articles in a clean, fast-loading format directly in the Telegram app.
+This guide explains how to set up [Telegram Instant View 2.1](https://instantview.telegram.org/) for your blog. Instant View allows Telegram users to read your articles in a clean, fast-loading format directly in the Telegram app.
 
 ## What is Instant View?
 
@@ -11,6 +11,7 @@ Telegram Instant View provides a clean reading experience for articles shared in
 - Works even with slow connections
 - No ads or clutter
 - Optimized for mobile devices
+- Rich media support
 
 ## Setup Instructions
 
@@ -18,6 +19,7 @@ Telegram Instant View provides a clean reading experience for articles shared in
 
 - A Telegram account
 - Access to the [Instant View Editor](https://instantview.telegram.org/)
+- Understanding of the IV 2.1 template format
 
 ### 2. Using the Template
 
@@ -40,9 +42,22 @@ Telegram Instant View provides a clean reading experience for articles shared in
    - Author and date information is present
    - The article content displays properly
    - Code blocks are formatted correctly
-   - Images load properly
+   - Images load properly with captions (if they have alt text)
+   - Related articles (tags) display properly
 
-### 4. Customization Options
+### 4. IV 2.1 Features
+
+Our template uses the following Instant View 2.1 features:
+
+- **Site name:** Specifies the site name for proper attribution
+- **Description:** Extracts article summary for link previews
+- **Cover images:** Displays featured images as cover
+- **Figure captions:** Preserves image alt text as captions
+- **Related articles:** Shows tag links as related content
+- **RTL support:** Commented code for right-to-left languages (if needed)
+- **Unsupported content marking:** Properly flags content that can't be rendered in IV
+
+### 5. Customization Options
 
 #### Telegram Channel Link
 
@@ -56,13 +71,15 @@ This adds a "Join Channel" button to your Instant View pages.
 
 #### Cover Image
 
-If your articles typically have a featured image, uncomment and adjust the cover image selector:
+If your articles typically have a featured image, the template is already set to use the first image in the article as the cover. You can modify this selector if needed:
 
 ```
-#cover: //article[contains(@class, "post")]//img[1]
+@if_exists: //article[contains(@class, "post")]//img[1]
+cover: //article[contains(@class, "post")]//img[1]
+@end
 ```
 
-### 5. Publishing the Template
+### 6. Publishing the Template
 
 You have two options for making your Instant View template available:
 
@@ -78,16 +95,29 @@ Generate `t.me/iv?url=...&rhash=...` links with your template hash and share tho
 
 Submit your template for approval by Telegram's team:
 
-1. Click "Submit Template" in the Instant View Editor
-2. Wait for Telegram's approval (may take several days)
-3. Once approved, anyone sharing links to your blog in Telegram will see the Instant View button
+1. Complete the "Track Changes" process to ensure your template works across various articles
+2. Click "Submit Template" in the Instant View Editor
+3. Wait for Telegram's approval (may take several days to a week)
+4. Once approved, anyone sharing links to your blog in Telegram will see the Instant View button
+
+## Perfect Template Checklist
+
+Before submitting your template, review Telegram's [Perfect Template Checklist](https://instantview.telegram.org/checklist#perfect-templates) to ensure your template is ready for approval:
+
+1. ✅ Uses Instant View 2.1
+2. ✅ Handles all article types on your blog correctly
+3. ✅ Properly marks unsupported content
+4. ✅ Maintains proper headings hierarchy (h1, h2, h3, etc.)
+5. ✅ Preserves image captions and attribution
+6. ✅ Properly formats code blocks
+7. ✅ Displays related articles through tags
+8. ✅ Includes proper site_name
 
 ## Adding Share Links to Your Blog
 
-To encourage sharing your articles with Instant View, add a Telegram share button to your blog posts:
+To encourage sharing your articles with Instant View, add a Telegram share button to your blog posts (already implemented):
 
 ```javascript
-// Add this code to your share buttons section in js/ui.js
 const telegramButton = createElement('a', {
   href: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}`,
   className: 'social-button telegram-share',
@@ -105,9 +135,10 @@ If your Instant View template isn't working as expected:
 1. **Content not displaying correctly**: Check your selectors and make sure they match the HTML structure of your blog
 2. **Images not loading**: Verify the image path replacements in the template
 3. **Template rejected**: Review Telegram's [checklist](https://instantview.telegram.org/checklist) for template requirements
+4. **Version mismatch**: Ensure your template specifies version 2.1 features and syntax
 
 ## Resources
 
 - [Instant View Documentation](https://instantview.telegram.org/docs)
-- [Instant View Checklist](https://instantview.telegram.org/checklist)
-- [Template Guide](https://instantview.telegram.org/guide) 
+- [Perfect Template Checklist](https://instantview.telegram.org/checklist#perfect-templates)
+- [Template Language Reference](https://instantview.telegram.org/docs#instant-view-format-reference) 
