@@ -7,74 +7,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util');
+const { extractFrontmatter } = require('./lib/markdownProcessor');
+const { readFile, writeFile, listFiles } = require('./lib/fileHandler');
+const { loadConfig, getConfig } = require('./lib/configManager');
 
-const readFileAsync = promisify(fs.readFile);
-const writeFileAsync = promisify(fs.writeFile);
-const readDirAsync = promisify(fs.readdir);
-const statAsync = promisify(fs.stat);
-
-// Путь к директории с постами
+// Скрипт может работать до завершения инициализации конфигурации
 const POSTS_DIR = path.join(__dirname, '../content/posts');
-// Путь к файлу индекса
 const INDEX_FILE = path.join(POSTS_DIR, 'index.json');
-
-/**
- * Извлечение метаданных из frontmatter в Markdown-файле
- * @param {string} content - Содержимое файла
- * @returns {Object} - Объект с метаданными
- */
-function extractFrontmatter(content) {
-  const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n/;
-  const match = content.match(frontmatterRegex);
-  
-  if (!match || match.length < 2) {
-    return {};
-  }
-  
-  const frontmatterText = match[1];
-  const result = {};
-  
-  // Разбираем YAML-подобный формат
-  frontmatterText.split('\n').forEach(line => {
-    const colonPos = line.indexOf(':');
-    
-    if (colonPos !== -1) {
-      const key = line.slice(0, colonPos).trim();
-      let value = line.slice(colonPos + 1).trim();
-      
-      // Убираем кавычки, если они есть
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1);
-      }
-      
-      // Обработка массивов в формате [item1, item2]
-      if (value.startsWith('[') && value.endsWith(']')) {
-        try {
-          // Пытаемся разобрать как JSON
-          result[key] = JSON.parse(value);
-        } catch (e) {
-          // Если не получилось как JSON, разбираем вручную
-          const items = value.slice(1, -1).split(',');
-          result[key] = items.map(item => {
-            item = item.trim();
-            // Убираем кавычки у элементов массива
-            if ((item.startsWith('"') && item.endsWith('"')) || 
-                (item.startsWith("'") && item.endsWith("'"))) {
-              return item.slice(1, -1);
-            }
-            return item;
-          });
-        }
-      } else {
-        result[key] = value;
-      }
-    }
-  });
-  
-  return result;
-}
 
 /**
  * Генерация индекса постов
@@ -83,65 +22,84 @@ async function generateIndex() {
   try {
     console.log('Начинаем генерацию index.json...');
     
+    // Загружаем конфигурацию
+    await loadConfig();
+    const config = getConfig();
+    const POSTS_DIR = config.paths.postsDir;
+    const INDEX_FILE = path.join(POSTS_DIR, 'index.json');
+    
     // Получаем список файлов в директории posts
-    const files = await readDirAsync(POSTS_DIR);
+    const files = await listFiles(POSTS_DIR, '.md');
     
-    // Фильтруем только .md файлы
-    const markdownFiles = files.filter(file => file.endsWith('.md'));
-    
-    console.log(`Найдено ${markdownFiles.length} markdown-файлов`);
+    console.log(`Найдено ${files.length} markdown-файлов`);
     
     // Обрабатываем каждый файл
     const postsMetadata = await Promise.all(
-      markdownFiles.map(async (filename) => {
-        const filePath = path.join(POSTS_DIR, filename);
-        const stat = await statAsync(filePath);
-        
-        // Пропускаем директории
-        if (stat.isDirectory()) {
-          return null;
-        }
+      files.map(async (filename) => {
+        // Пропускаем файл index.md если он существует
+        if (filename === 'index.md') return null;
         
         try {
-          // Читаем содержимое файла
-          const content = await readFileAsync(filePath, 'utf8');
+          const filePath = path.join(POSTS_DIR, filename);
+          const content = await readFile(filePath);
           
           // Извлекаем метаданные из frontmatter
-          const metadata = extractFrontmatter(content);
+          const { data } = extractFrontmatter(content);
           
-          // Добавляем имя файла и слаг, если они не указаны
-          const fileBase = path.basename(filename, '.md');
+          // Проверяем наличие необходимых полей
+          if (!data.title || !data.date) {
+            console.warn(`Предупреждение: Отсутствуют обязательные поля в ${filename}`);
+            
+            // Если отсутствует дата, используем дату модификации файла
+            if (!data.date) {
+              const stats = fs.statSync(filePath);
+              data.date = stats.mtime.toISOString().slice(0, 10);
+            }
+            
+            // Если отсутствует заголовок, используем имя файла
+            if (!data.title) {
+              data.title = filename.replace('.md', '').replace(/-/g, ' ');
+            }
+          }
           
+          // Формируем объект с метаданными
           return {
-            ...metadata,
-            file: fileBase,
-            slug: metadata.slug || fileBase
+            file: filename.replace('.md', ''),
+            title: data.title,
+            date: data.date,
+            tags: data.tags || [],
+            summary: data.summary || ''
           };
         } catch (error) {
-          console.error(`Ошибка при обработке файла ${filename}:`, error);
+          console.error(`Ошибка обработки файла ${filename}:`, error);
           return null;
         }
       })
     );
     
-    // Убираем null-значения и сортируем по дате (новые сначала)
-    const validPosts = postsMetadata
-      .filter(post => post !== null)
-      .sort((a, b) => {
-        if (!a.date) return 1;
-        if (!b.date) return -1;
-        return new Date(b.date) - new Date(a.date);
-      });
+    // Фильтруем null значения
+    const validPosts = postsMetadata.filter(post => post !== null);
     
-    // Записываем индекс в файл
-    await writeFileAsync(INDEX_FILE, JSON.stringify(validPosts, null, 2), 'utf8');
+    // Сортируем по дате (от новых к старым)
+    validPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    console.log(`Индекс успешно сгенерирован! Обработано ${validPosts.length} статей.`);
+    console.log(`Обработано ${validPosts.length} валидных записей`);
+    
+    // Записываем индекс в JSON файл
+    await writeFile(INDEX_FILE, JSON.stringify(validPosts, null, 2));
+    
+    console.log(`Файл индекса успешно создан: ${INDEX_FILE}`);
+    
+    return validPosts;
   } catch (error) {
-    console.error('Ошибка при генерации индекса:', error);
+    console.error('Ошибка создания индекса:', error);
     process.exit(1);
   }
 }
 
-// Запускаем генерацию индекса
-generateIndex(); 
+// Если файл запущен напрямую (не импортирован)
+if (require.main === module) {
+  generateIndex();
+}
+
+module.exports = { generateIndex }; 
