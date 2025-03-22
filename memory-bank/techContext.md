@@ -49,7 +49,7 @@ npm run deploy
 /
 ├── .github/
 │   └── workflows/
-│       ├── update-index.yml    # GitHub Actions для обновления индекса
+│       ├── update-content.yml    # GitHub Actions для обновления индекса и генерации статических HTML
 │       └── github-pages.yml    # GitHub Actions для деплоя на GitHub Pages
 ├── .cursor/
 │   └── rules/                  # Правила для IDE Cursor

@@ -1,4 +1,4 @@
-name: Update Index
+name: Update Content
 
 on:
   push:
@@ -6,9 +6,11 @@ on:
       - master
     paths:
       - 'content/posts/**.md'  # Запускать только когда изменяются markdown файлы в posts
+      - 'js/ui.js'            # Или когда изменяются шаблоны отображения
+      - 'css/style.css'       # Или когда изменяются стили, влияющие на внешний вид
 
 jobs:
-  update-index:
+  update-content:
     runs-on: ubuntu-latest
     
     steps:
@@ -28,12 +30,17 @@ jobs:
         run: npm run update-index
         working-directory: ./
       
+      - name: Run generate-static script
+        run: npm run generate-static
+        working-directory: ./
+      
       - name: Commit changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add content/posts/index.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update index.json"
+          git add -f static/posts/*.html
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update index.json and static HTML files"
       
       - name: Push changes
         uses: ad-m/github-push-action@master
