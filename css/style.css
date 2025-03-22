@@ -1,5 +1,5 @@
 :root {
-  /* Main colors */
+  /* These variables will be overridden by the configuration */
   --primary-color: #18181b; /* Dark base */
   --secondary-color: #64748b; /* Subtle text */
   --accent-color: #3b82f6; /* Blue accent */

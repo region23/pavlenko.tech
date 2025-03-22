@@ -3,6 +3,7 @@
  */
 
 import { renderMarkdown } from './content.js';
+import { get } from './config.js';
 
 /**
  * Создает DOM элемент с заданными атрибутами и содержимым
@@ -142,12 +143,24 @@ function renderPostList(posts, container, title = 'Latest Posts') {
       datetime: post.date,
     }, `${formattedDate}`);
     
-    const readingTimeElement = createElement('span', {
-      className: 'reading-time'
-    }, `${readingTime} min read`);
-    
     metaContainer.appendChild(dateElement);
-    metaContainer.appendChild(readingTimeElement);
+    
+    // Add author, if available in post data or config
+    const author = post.author || get('content.defaultAuthor');
+    if (author) {
+      const authorElement = createElement('span', {
+        className: 'post-author'
+      }, author);
+      metaContainer.appendChild(authorElement);
+    }
+    
+    // Add reading time if enabled in config
+    if (get('content.showReadingTime', true)) {
+      const readingTimeElement = createElement('span', {
+        className: 'reading-time'
+      }, `${readingTime} min read`);
+      metaContainer.appendChild(readingTimeElement);
+    }
     
     // Краткое описание статьи
     const summary = createElement('div', { 
@@ -172,28 +185,26 @@ function renderPostList(posts, container, title = 'Latest Posts') {
 }
 
 /**
- * Рассчитывает примерное время чтения текста
+ * Расчет примерного времени чтения текста
  * @param {string} text - Текст для расчета
- * @param {number} wordsPerMinute - Средняя скорость чтения (слов в минуту)
+ * @param {number} wordsPerMinute - Скорость чтения (слов в минуту)
  * @returns {number} - Время чтения в минутах
  */
-function calculateReadingTime(text, wordsPerMinute = 200) {
+function calculateReadingTime(text, wordsPerMinute) {
   if (!text) return 1;
   
-  // Удаляем HTML-теги и Markdown-разметку
-  const cleanText = text
-    .replace(/<[^>]*>/g, '') // Удаление HTML-тегов
-    .replace(/!\[.*?\]\(.*?\)/g, '') // Удаление Markdown-изображений
-    .replace(/\[.*?\]\(.*?\)/g, '$1') // Замена Markdown-ссылок на текст
-    .replace(/[#*_~`]/g, ''); // Удаление одиночных символов форматирования
+  // Get words per minute from config, or use default if not provided
+  if (wordsPerMinute === undefined) {
+    wordsPerMinute = get('content.wordsPerMinute', 200);
+  }
   
-  // Считаем количество слов
-  const words = cleanText.split(/\s+/).filter(Boolean).length;
+  // Считаем количество слов (приблизительно)
+  const words = text.trim().split(/\s+/).length;
   
-  // Рассчитываем время чтения и округляем до целого числа
+  // Вычисляем время чтения
   const minutes = Math.ceil(words / wordsPerMinute);
   
-  // Минимум 1 минута
+  // Возвращаем как минимум 1 минуту
   return Math.max(1, minutes);
 }
 
@@ -255,12 +266,23 @@ async function renderPost(postData, content, container) {
       metaContainer.appendChild(dateElement);
     }
     
-    // Добавляем расчет времени чтения
-    const readingTime = calculateReadingTime(contentWithoutTitle);
-    const readingTimeElement = createElement('span', {
-      className: 'reading-time'
-    }, `${readingTime} min read`);
-    metaContainer.appendChild(readingTimeElement);
+    // Добавляем автора, если он указан в данных статьи или в конфигурации
+    const author = postData.author || get('content.defaultAuthor');
+    if (author) {
+      const authorElement = createElement('span', {
+        className: 'post-author'
+      }, author);
+      metaContainer.appendChild(authorElement);
+    }
+    
+    // Добавляем расчет времени чтения, если это включено в конфигурации
+    if (get('content.showReadingTime', true)) {
+      const readingTime = calculateReadingTime(contentWithoutTitle);
+      const readingTimeElement = createElement('span', {
+        className: 'reading-time'
+      }, `${readingTime} min read`);
+      metaContainer.appendChild(readingTimeElement);
+    }
     
     header.appendChild(metaContainer);
     

@@ -6,6 +6,7 @@
 import { initRouter, navigateTo, getCurrentRoute } from './router.js';
 import { fetchContentList, fetchContent, processFrontmatter, clearContentCache } from './content.js';
 import { renderPostList, renderPost, renderTagsList, renderAbout, renderError } from './ui.js';
+import { loadConfig, get, applyThemeColors, applyFonts } from './config.js';
 
 // Состояние приложения
 const state = {
@@ -13,7 +14,8 @@ const state = {
   tags: {},
   currentRoute: null,
   isLoading: false,
-  aboutContent: null
+  aboutContent: null,
+  config: null
 };
 
 // Маршруты приложения
@@ -53,6 +55,20 @@ async function initApp() {
       throw new Error('Элемент контента не найден');
     }
     
+    // Загрузка конфигурации
+    state.config = await loadConfig();
+    
+    // Применяем настройки темы из конфигурации
+    applyThemeColors();
+    applyFonts();
+    
+    // Обновляем заголовок и метаданные страницы
+    updatePageMetadata();
+    
+    // Обновляем навигацию и футер из конфигурации
+    updateNavigation();
+    updateFooter();
+    
     // Инициализация маршрутизатора
     initRouter(handleRouteChange);
     
@@ -77,6 +93,91 @@ async function initApp() {
       title: 'Application Error',
       message: 'An error occurred while initializing the application.',
       error: error
+    });
+  }
+}
+
+/**
+ * Обновляет заголовок и метаданные страницы на основе конфигурации
+ */
+function updatePageMetadata() {
+  // Обновляем заголовок страницы
+  document.title = get('site.title');
+  
+  // Обновляем метатег description
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  if (descriptionMeta) {
+    descriptionMeta.setAttribute('content', get('site.description'));
+  }
+  
+  // Устанавливаем язык страницы
+  document.documentElement.setAttribute('lang', get('site.language', 'en'));
+}
+
+/**
+ * Обновляет навигацию на основе конфигурации
+ */
+function updateNavigation() {
+  const navLinksElement = document.querySelector('.nav-links');
+  if (!navLinksElement) return;
+  
+  // Очищаем текущую навигацию
+  navLinksElement.innerHTML = '';
+  
+  // Получаем элементы навигации из конфигурации
+  const navItems = get('navigation.items', []);
+  
+  // Создаем элементы навигации
+  navItems.forEach(item => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = item.url;
+    a.textContent = item.label;
+    if (item.active) {
+      a.classList.add('active');
+    }
+    li.appendChild(a);
+    navLinksElement.appendChild(li);
+  });
+  
+  // Обновляем лого и описание
+  const logoElement = document.querySelector('.logo');
+  if (logoElement) {
+    logoElement.textContent = get('site.title');
+  }
+  
+  const descriptionElement = document.querySelector('.site-description');
+  if (descriptionElement) {
+    descriptionElement.textContent = get('site.description');
+  }
+}
+
+/**
+ * Обновляет футер на основе конфигурации
+ */
+function updateFooter() {
+  // Обновляем копирайт
+  const copyrightElement = document.querySelector('footer p');
+  if (copyrightElement) {
+    copyrightElement.textContent = get('site.copyright');
+  }
+  
+  // Обновляем социальные ссылки
+  const footerLinksElement = document.querySelector('.footer-links');
+  if (footerLinksElement) {
+    // Очищаем текущие ссылки
+    footerLinksElement.innerHTML = '';
+    
+    // Добавляем социальные ссылки из конфигурации
+    const socialLinks = get('social.links', []);
+    
+    socialLinks.forEach(link => {
+      const a = document.createElement('a');
+      a.href = link.url;
+      a.textContent = link.platform;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      footerLinksElement.appendChild(a);
     });
   }
 }
