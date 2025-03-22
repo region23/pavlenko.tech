@@ -5,34 +5,28 @@
   // Function to set theme
   function setTheme(isDark) {
     if (isDark) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('darkMode', 'true');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
       
-      // Update icons
-      const sunIcon = document.querySelector('.sun-icon');
-      const moonIcon = document.querySelector('.moon-icon');
-      
-      if (sunIcon) sunIcon.style.display = 'none';
-      if (moonIcon) moonIcon.style.display = 'block';
+      // Update icon
+      const themeToggleIcon = document.querySelector('.theme-toggle-icon');
+      if (themeToggleIcon) themeToggleIcon.textContent = '☀️';
     } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('darkMode', 'false');
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
       
-      // Update icons
-      const sunIcon = document.querySelector('.sun-icon');
-      const moonIcon = document.querySelector('.moon-icon');
-      
-      if (sunIcon) sunIcon.style.display = 'block';
-      if (moonIcon) moonIcon.style.display = 'none';
+      // Update icon
+      const themeToggleIcon = document.querySelector('.theme-toggle-icon');
+      if (themeToggleIcon) themeToggleIcon.textContent = '🌙';
     }
   }
   
   // Initialize theme based on preferences
   function initializeTheme() {
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const storedPreference = localStorage.getItem('darkMode');
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    if (storedPreference === 'true' || (prefersDark && storedPreference === null)) {
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setTheme(true);
     } else {
       setTheme(false);
@@ -44,8 +38,21 @@
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
       themeToggle.addEventListener('click', function() {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        setTheme(!isDarkMode);
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Обновляем иконку
+        const themeToggleIcon = themeToggle.querySelector('.theme-toggle-icon');
+        if (themeToggleIcon) themeToggleIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        
+        // Анимация перехода
+        document.documentElement.classList.add('theme-transition');
+        setTimeout(() => {
+          document.documentElement.classList.remove('theme-transition');
+        }, 300);
       });
     }
   }

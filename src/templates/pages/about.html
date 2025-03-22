@@ -1,9 +1,13 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% block content %}
-  <div class="about-page">
-    <div class="about-content">
-      {{ about.htmlContent }}
-    </div>
+<div class="container">
+  <header class="page-header">
+    <h1>О блоге</h1>
+  </header>
+  
+  <div class="page-content">
+    {{ content }}
   </div>
+</div>
 {% endblock %} 

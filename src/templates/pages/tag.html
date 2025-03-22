@@ -2,47 +2,75 @@
 
 {% block content %}
 <div class="container">
-  <h1 class="page-title">Posts tagged with "{{ tag.name }}"</h1>
+  <header class="page-header">
+    <h1>Тег: {{ tag.name }}</h1>
+    <p>{{ tag.count }} {{ tag.count | pluralize: 'запись', 'записи', 'записей' }}</p>
+  </header>
   
-  {% if tag.posts %}
-    <div class="posts-grid">
-      {% for post in tag.posts %}
-        <article class="post-card">
+  <ul class="posts-list">
+    {% for post in posts %}
+      <li>
+        <article>
+          {% if post.category %}
+            <div class="post-category-container">
+              <span class="post-category category-{{ post.category | lower }}">{{ post.category }}</span>
+            </div>
+          {% endif %}
+          
           <h2 class="post-title">
             <a href="{{ post.url }}">{{ post.title }}</a>
           </h2>
+          
           <div class="post-meta">
             <time datetime="{{ post.date }}">{{ post.date }}</time>
             {% if post.author %}
-              <span class="post-author">by {{ post.author }}</span>
+              <span class="post-author">{{ post.author }}</span>
             {% endif %}
             {% if post.readingTime %}
-              <span class="post-reading-time">{{ post.readingTime }} min read</span>
+              <span class="post-reading-time">{{ post.readingTime }} мин. чтения</span>
             {% endif %}
           </div>
+          
           {% if post.excerpt %}
             <div class="post-excerpt">
               <p>{{ post.excerpt }}</p>
             </div>
           {% endif %}
-          <a href="{{ post.url }}" class="read-more">Read more</a>
+          
+          {% if post.tags && post.tags.length > 0 %}
+            <div class="post-tags">
+              {% for postTag in post.tags %}
+                <a href="/tags/{{ postTag.slug }}/" class="post-tag">{{ postTag.name }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+          
+          <a href="{{ post.url }}" class="read-more">Читать далее →</a>
         </article>
-      {% endfor %}
+      </li>
+    {% endfor %}
+  </ul>
+  
+  {% if pagination %}
+    <div class="pagination">
+      {% if pagination.previousPage %}
+        <a href="{{ pagination.previousPage }}" class="pagination-prev">← Предыдущая</a>
+      {% else %}
+        <span class="pagination-prev disabled">← Предыдущая</span>
+      {% endif %}
+      
+      <span class="pagination-info">Страница {{ pagination.currentPage }} из {{ pagination.totalPages }}</span>
+      
+      {% if pagination.nextPage %}
+        <a href="{{ pagination.nextPage }}" class="pagination-next">Следующая →</a>
+      {% else %}
+        <span class="pagination-next disabled">Следующая →</span>
+      {% endif %}
     </div>
-    
-    {% if tag.pagination %}
-      <div class="pagination">
-        {% if tag.pagination.previousPage %}
-          <a href="{{ tag.pagination.previousPage }}" class="pagination-prev">&larr; Previous</a>
-        {% endif %}
-        
-        {% if tag.pagination.nextPage %}
-          <a href="{{ tag.pagination.nextPage }}" class="pagination-next">Next &rarr;</a>
-        {% endif %}
-      </div>
-    {% endif %}
-  {% else %}
-    <p>No posts found with this tag.</p>
   {% endif %}
+  
+  <div class="back-to-tags">
+    <a href="/tags/">← Вернуться ко всем тегам</a>
+  </div>
 </div>
 {% endblock %} 

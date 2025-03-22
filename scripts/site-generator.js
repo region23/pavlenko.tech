@@ -48,6 +48,37 @@ function loadConfig() {
 }
 
 /**
+ * Copy a file or directory recursively
+ * @param {string} source - Source path
+ * @param {string} target - Target path
+ */
+function copyRecursive(source, target) {
+  // Create target directory if it doesn't exist
+  if (!fs.existsSync(target)) {
+    fs.mkdirSync(target, { recursive: true });
+  }
+  
+  // Get all files and directories in the source
+  const entries = fs.readdirSync(source, { withFileTypes: true });
+  
+  // Copy each entry
+  for (const entry of entries) {
+    const sourcePath = path.join(source, entry.name);
+    const targetPath = path.join(target, entry.name);
+    
+    if (entry.isDirectory()) {
+      // Recursively copy directory
+      copyRecursive(sourcePath, targetPath);
+      console.log(`Copied directory: ${entry.name}`);
+    } else {
+      // Copy file
+      fs.copyFileSync(sourcePath, targetPath);
+      console.log(`Copied file: ${entry.name}`);
+    }
+  }
+}
+
+/**
  * Copy static assets to output directory
  */
 async function copyStaticAssets() {
@@ -65,13 +96,40 @@ async function copyStaticAssets() {
       const sourcePath = path.join(STATIC_DIR, file);
       const targetPath = path.join(OUTPUT_DIR, 'static', file);
       
-      if (fs.statSync(sourcePath).isFile()) {
+      if (fs.statSync(sourcePath).isDirectory()) {
+        // Recursively copy directory
+        copyRecursive(sourcePath, targetPath);
+      } else {
+        // Copy file
         fs.copyFileSync(sourcePath, targetPath);
         console.log(`Copied: ${file} to /static/`);
       }
     }
   } catch (error) {
     console.error('Error copying static assets:', error);
+  }
+}
+
+/**
+ * Copy special files to the root of the dist directory
+ */
+async function copySpecialFiles() {
+  try {
+    const specialFiles = [
+      { source: path.join(STATIC_DIR, 'favicon.ico'), target: path.join(OUTPUT_DIR, 'favicon.ico') },
+      { source: path.join(STATIC_DIR, '_redirects'), target: path.join(OUTPUT_DIR, '_redirects') },
+      { source: path.join(STATIC_DIR, '.htaccess'), target: path.join(OUTPUT_DIR, '.htaccess') },
+      { source: path.join(STATIC_DIR, '.nojekyll'), target: path.join(OUTPUT_DIR, '.nojekyll') }
+    ];
+    
+    for (const file of specialFiles) {
+      if (fs.existsSync(file.source)) {
+        fs.copyFileSync(file.source, file.target);
+        console.log(`Copied special file: ${path.basename(file.source)} to dist root`);
+      }
+    }
+  } catch (error) {
+    console.error('Error copying special files:', error);
   }
 }
 
@@ -89,6 +147,9 @@ async function generateStaticSite() {
     
     // Copy static assets
     await copyStaticAssets();
+    
+    // Copy special files to the root of the dist directory
+    await copySpecialFiles();
     
     // Process content
     const config = loadConfig();

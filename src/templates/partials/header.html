@@ -2,15 +2,23 @@
   <div class="container">
     <nav>
       <div class="logo-container">
-        <a href="/" class="logo">{{ title }}</a>
-        <span class="site-description">{{ description }}</span>
+        <a href="/" class="logo">{{ site.title }}</a>
+        <span class="site-description">{{ site.description }}</span>
       </div>
-      <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/tags/">Tags</a></li>
-        <li><a href="/about/">About</a></li>
+      
+      <button class="hamburger-menu" id="menu-toggle" aria-label="Меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/">Блог</a></li>
+        <li><a href="/tags/">Теги</a></li>
+        <li><a href="/about/">О блоге</a></li>
       </ul>
-      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark theme">
+      
+      <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
         <span class="theme-toggle-icon">🌙</span>
       </button>
     </nav>

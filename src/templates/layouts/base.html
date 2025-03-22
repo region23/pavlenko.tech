@@ -6,12 +6,16 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: http:; connect-src 'self' localhost:*;">
   <title>{% if title %}{{ title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
   <meta name="description" content="{% if description %}{{ description }}{% else %}{{ site.description }}{% endif %}">
+  <meta name="author" content="{{ site.author }}">
+  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
   
-  <!-- Fonts and styles -->
+  <!-- Шрифты и стили -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
   {% include 'partials/header.html' %}
@@ -24,7 +28,8 @@
 
   {% include 'partials/footer.html' %}
 
-  <!-- Minimal JavaScript for theme toggle and pagination -->
-  <script src="/js/theme.js"></script>
+  <!-- JavaScript для переключения темы и мобильного меню -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/menu.js"></script>
 </body>
 </html> 

@@ -48,51 +48,42 @@ npm start
 npm run update-index
 
 # Генерация статических HTML-файлов
-npm run generate-static
-
-# Полная сборка (индекс + статические файлы)
-npm run build
-
-# Упрощенный деплой
-npm run deploy
+npm run generate
 ```
 
-## Структура системы
+## Команды npm
+```json
+{
+  "scripts": {
+    "start": "npx serve dist",
+    "dev": "npm run generate && npx serve dist",
+    "generate": "node scripts/site-generator.js",
+    "build": "npm run generate",
+    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
+  }
+}
 ```
-/
-├── .github/
+
+## Структура проекта
+
+```
+pavlenko.tech/
+├── .github/                   # GitHub Actions workflows
 │   └── workflows/
-│       ├── update-content.yml    # GitHub Actions для обновления индекса и генерации статических HTML
-│       └── github-pages.yml    # GitHub Actions для деплоя на GitHub Pages
-├── .cursor/
-│   └── rules/                  # Правила для IDE Cursor
-├── content/
-│   ├── about/
-│   │   └── index.md            # Информация о блоге/авторе
-│   └── posts/
-│       ├── index.json          # Индекс всех статей
-│       ├── example-post.md     # Статьи в формате Markdown
-│       └── hello-world.md
-├── css/
-│   └── style.css               # Стили сайта
-├── dist/                       # Директория с сгенерированным статическим сайтом
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│   ├── posts/
-│   ├── tags/
-│   └── index.html
-├── docs/
-│   ├── hybrid-rendering.md     # Документация по гибридному рендерингу
-│   └── telegram-instant-view.md # Документация по Telegram Instant View
-├── js/
-│   ├── app.js                  # Основной JS-код
-│   ├── config.js               # Модуль для работы с конфигурацией
-│   ├── content.js              # Работа с контентом
-│   ├── router.js               # Маршрутизация
-│   └── ui.js                   # Пользовательский интерфейс
-├── images/                     # Изображения для сайта
-├── memory-bank/                # Документация проекта
+│       └── github-pages.yml   # Workflow для GitHub Pages
+├── .cursor/                   # Настройки для Cursor IDE
+├── content/                   # Содержимое сайта
+│   ├── posts/                 # Статьи в формате Markdown
+│   └── about.md               # Страница "О сайте"
+├── dist/                      # Сгенерированный статический сайт
+│   ├── static/                # Скопированные статические ресурсы
+│   ├── posts/                 # HTML-версии статей
+│   ├── tags/                  # Страницы тегов
+│   ├── index.html             # Главная страница
+│   ├── sitemap.xml            # Карта сайта
+│   └── ...                    # Другие файлы
+├── docs/                      # Документация
+├── memory-bank/               # Документация проекта
 │   ├── activeContext.md
 │   ├── productContext.md
 │   ├── progress.md
@@ -100,29 +91,30 @@ npm run deploy
 │   ├── systemPatterns.md
 │   └── techContext.md
 ├── scripts/
-│   ├── generate-index.js       # Скрипт для обновления индекса
-│   └── site-generator.js       # Скрипт для генерации статических HTML
+│   ├── generate-index.js      # Скрипт для обновления индекса
+│   └── site-generator.js      # Генератор статического сайта
 ├── src/
-│   ├── engine/                 # Компоненты движка генератора статического сайта
-│   │   ├── template.js         # Движок шаблонов
-│   │   └── content.js          # Обработчик контента
-│   └── templates/              # Шаблоны страниц
-│       ├── layouts/            # Базовые макеты
-│       ├── partials/           # Повторно используемые части страниц
-│       └── pages/              # Шаблоны конкретных страниц
-├── static/
-│   └── posts/                  # Статические HTML-версии статей
-├── .gitignore                  # Исключения для Git
-├── .htaccess                   # Правила перенаправления и обнаружения ботов
-├── .nojekyll                   # Отключение обработки Jekyll для GitHub Pages
-├── 404.html                    # Страница 404
-├── _redirects                  # Правила перенаправления для Netlify
-├── config.json                 # Конфигурация блога
-├── favicon.ico                 # Иконка сайта
-├── index.html                  # Главная страница (SPA)
-├── package.json                # Зависимости и скрипты
-├── telegram-iv-template.txt    # Шаблон для Telegram Instant View
-└── README.md                   # Документация проекта
+│   ├── engine/                # Компоненты движка генератора
+│   │   ├── assets.js          # Обработка статических ресурсов
+│   │   ├── template.js        # Движок шаблонов
+│   │   └── content.js         # Обработчик контента
+│   └── templates/             # Шаблоны страниц
+│       ├── layouts/           # Базовые макеты
+│       ├── partials/          # Повторно используемые части
+│       └── pages/             # Шаблоны конкретных страниц
+├── static/                    # Статические ресурсы
+│   ├── css/                   # Стили сайта
+│   ├── js/                    # JavaScript-файлы
+│   ├── images/                # Изображения
+│   ├── favicon.ico            # Иконка сайта
+│   ├── _redirects             # Правила перенаправления для Netlify
+│   └── .htaccess              # Правила перенаправления и обнаружения ботов
+├── .gitignore                 # Исключения для Git
+├── .nojekyll                  # Отключение обработки Jekyll для GitHub Pages
+├── config.json                # Конфигурация блога
+├── package.json               # Зависимости и скрипты
+├── telegram-iv-template.txt   # Шаблон для Telegram Instant View
+└── README.md                  # Документация проекта
 ```
 
 ## Рабочие процессы и инструменты
@@ -130,7 +122,7 @@ npm run deploy
 ### Локальная разработка
 1. Запуск сервера: `npm start`
 2. Обновление индекса: `npm run update-index`
-3. Генерация статических HTML: `npm run generate-static`
+3. Генерация статических HTML: `npm run generate`
 4. Полная сборка: `npm run build`
 5. Просмотр в браузере по адресу: `http://localhost:3000`
 6. Тестирование статической версии сайта: `cd dist && python3 -m http.server 8000`
@@ -163,7 +155,8 @@ npm run deploy
 4. Обработка условий, циклов и вложенных шаблонов
 5. Постобработка HTML для очистки неразрешенных шаблонных тегов
 6. Сохранение финальных HTML-файлов в директории dist
-7. Копирование статических ресурсов в директорию dist
+7. Копирование статических ресурсов в директорию dist/static
+8. Копирование специальных файлов (favicon.ico, _redirects, .htaccess) в корень dist
 
 ### Telegram Instant View
 1. Шаблон расположен в файле `telegram-iv-template.txt`
