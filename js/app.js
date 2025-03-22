@@ -62,6 +62,9 @@ async function initApp() {
     // Инициализация обработчика темной темы
     initDarkModeToggle();
     
+    // Инициализация обработчика прокрутки
+    initScrollHandlers();
+    
     // Определяем и обрабатываем текущий маршрут
     const currentPath = getCurrentRoute();
     await handleRouteChange(currentPath);
@@ -462,6 +465,29 @@ function initDarkModeToggle() {
     sunIcon.style.display = isDarkMode ? 'none' : 'block';
     moonIcon.style.display = isDarkMode ? 'block' : 'none';
   }
+}
+
+/**
+ * Инициализирует обработчики прокрутки
+ */
+function initScrollHandlers() {
+  const header = document.querySelector('header');
+  if (!header) return;
+  
+  // Функция-обработчик прокрутки
+  const handleScroll = () => {
+    if (window.scrollY > 10) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  };
+  
+  // Добавляем обработчик прокрутки
+  window.addEventListener('scroll', handleScroll);
+  
+  // Вызываем обработчик при инициализации
+  handleScroll();
 }
 
 // Инициализируем приложение при загрузке
