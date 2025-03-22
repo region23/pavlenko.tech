@@ -42,7 +42,7 @@
     }
   },
   "content": {
-    "postsPerPage": 10,
+    "postsPerPage": 3,
     "showReadingTime": true,
     "defaultAuthor": "Pavel Pavlenko",
     "wordsPerMinute": 200

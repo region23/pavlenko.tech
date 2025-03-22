@@ -818,6 +818,11 @@ footer .container {
 
 .dark-mode .tag {
   background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.dark-mode .tag:hover {
+  background-color: rgba(59, 130, 246, 0.25);
 }
 
 /* Dark mode toggle */
@@ -956,4 +961,71 @@ footer .container {
   border-top-color: var(--dark-border);
 }
 
+/* Стили для облака тегов */
+.tags-page {
+  margin-top: 2rem;
+}
+
+.tags-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.tag-cloud-item {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(59, 130, 246, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+  font-weight: 500;
+}
+
+.tag-cloud-item:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+  text-decoration: none;
+}
+
+.dark-mode .tag-cloud-item {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.dark-mode .tag:hover,
+.dark-mode .tag-cloud-item:hover {
+  background-color: rgba(59, 130, 246, 0.25);
+}
+
 /* Адаптивные стили */
+
+/* Pagination controls */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) 0;
+}
+
+.pagination-prev,
+.pagination-next {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.pagination-prev.disabled,
+.pagination-next.disabled {
+  color: var(--secondary-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+}
