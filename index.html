@@ -3,6 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Скрипт для обнаружения ботов и перенаправления на статические HTML -->
+  <script>
+    // Регулярное выражение для обнаружения ботов и поисковых систем
+    const botPattern = /bot|telegram|whatsapp|facebook|twitter|linkedin|google|bing|yahoo|duckduckgo|yandex|baidu|spider|crawl|slurp|mediapartners/i;
+    
+    // Проверка User-Agent на наличие признаков бота
+    const isBot = botPattern.test(navigator.userAgent);
+    
+    // Если это бот и URL соответствует URL статьи
+    if (isBot && window.location.pathname.startsWith('/posts/')) {
+      const pathSegments = window.location.pathname.split('/');
+      const postSlug = pathSegments[pathSegments.length - 1] || pathSegments[pathSegments.length - 2];
+      
+      if (postSlug) {
+        // Перенаправляем на статический HTML-файл
+        window.location.href = '/static/posts/' + postSlug + '.html';
+      }
+    }
+  </script>
+  
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: http:; connect-src 'self' localhost:*;">
   <base href="/">
   <title>Loading...</title>

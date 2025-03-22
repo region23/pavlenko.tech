@@ -151,7 +151,7 @@ function generatePostHtml(post, htmlContent) {
   <script>
     // Redirect to SPA version for real users
     if (!/bot|telegram|whatsapp|facebook|twitter|linkedin|google|bing|yahoo|duckduckgo|yandex|baidu|spider|crawl|slurp|mediapartners/i.test(navigator.userAgent)) {
-      window.location.href = '/#/posts/${post.slug || post.file}';
+      window.location.href = '/posts/${post.slug || post.file}';
     }
   </script>
 </head>
