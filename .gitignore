@@ -49,3 +49,8 @@ logs
 static/posts/*.html
 # But keep the directory structure
 !static/posts/.gitkeep 
+
+
+# Сгенерированные файлы
+content/posts/index.json
+static/posts/*.html
