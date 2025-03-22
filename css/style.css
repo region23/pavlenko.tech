@@ -895,32 +895,45 @@ footer .container {
 }
 
 .social-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  margin-right: var(--space-xs);
+  margin-bottom: var(--space-xs);
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.9rem;
   font-weight: 500;
   transition: background-color var(--transition-fast);
 }
 
 .twitter-share {
-  background-color: rgba(29, 161, 242, 0.1);
-  color: #1da1f2;
+  background-color: #1DA1F2;
+  color: white;
 }
 
 .twitter-share:hover {
-  background-color: rgba(29, 161, 242, 0.2);
+  background-color: #0c85d0;
+  color: white;
 }
 
 .linkedin-share {
-  background-color: rgba(0, 119, 181, 0.1);
-  color: #0077b5;
+  background-color: #0077B5;
+  color: white;
 }
 
 .linkedin-share:hover {
-  background-color: rgba(0, 119, 181, 0.2);
+  background-color: #005e93;
+  color: white;
+}
+
+.telegram-share {
+  background-color: #0088cc;
+  color: white;
+}
+
+.telegram-share:hover {
+  background-color: #006fa3;
+  color: white;
 }
 
 .related-posts {

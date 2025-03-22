@@ -331,8 +331,16 @@ async function renderPost(postData, content, container) {
       rel: 'noopener'
     }, 'Share on LinkedIn');
     
+    const telegramButton = createElement('a', {
+      href: `https://t.me/share/url?url=${pageUrl}&text=${pageTitle}`,
+      className: 'social-button telegram-share',
+      target: '_blank',
+      rel: 'noopener'
+    }, 'Share on Telegram');
+    
     shareSection.appendChild(twitterButton);
     shareSection.appendChild(linkedinButton);
+    shareSection.appendChild(telegramButton);
     article.appendChild(shareSection);
     
     // Очищаем контейнер и добавляем статью

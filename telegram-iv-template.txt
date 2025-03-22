@@ -1,0 +1,50 @@
+# Instant View Template for Pavlenko.Tech Blog
+
+# Only apply to post pages, not the homepage, tags, or about page
+?path: /posts/.+
+
+# Site info - specify your Telegram channel if you have one
+#channel: https://t.me/yourtelegramchannel
+
+# Title - extract from the h1 in the post-header
+title: //*[contains(@class, "post-header")]/h1
+
+# Cover image - if available
+#cover: //article[contains(@class, "post")]//img[1]
+
+# Author - extract from the post-author span
+author: //*[contains(@class, "post-author")]/text()
+
+# Publication date - extract from the time element
+published_date: //*[contains(@class, "post-meta")]/time
+
+# Content extraction - main article content
+body: //div[contains(@class, "post-content")]
+
+# Handle code blocks specially to ensure proper formatting
+@replace_tag(<pre><code>): <pre>
+@replace_tag(<pre><code class): <pre class
+
+# Remove the share buttons and table of contents
+@remove: //div[contains(@class, "social-share")]
+@remove: //div[contains(@class, "table-of-contents")]
+
+# Process images to ensure they display properly
+@replace: //img[@src and (not(starts-with(@src, "http://")) and not(starts-with(@src, "https://")))]
+@attribute: src
+@replace_value: $@
+@prepend_value: https://pavlenko.tech/
+
+# If there are subheadings, make sure they are properly formatted
+@match: //h2
+@wrap: <h2>
+@match: //h3
+@wrap: <h3>
+@match: //h4
+@wrap: <h4>
+
+# Make sure links are properly handled
+@replace: //a[@href and not(starts-with(@href, "http")) and not(starts-with(@href, "https")) and not(starts-with(@href, "#"))]
+@attribute: href
+@replace_value: $@
+@prepend_value: https://pavlenko.tech/ 

@@ -11,6 +11,7 @@ A modern, lightweight static blog with a powerful configuration system, allowing
 - Markdown content with code highlighting
 - Automatic reading time calculation
 - Configurable appearance (colors, fonts, etc.)
+- Telegram Instant View support for fast article reading in Telegram
 
 ## Getting Started
 
@@ -148,6 +149,20 @@ For advanced customization beyond the configuration file, you can:
 1. Edit the CSS in `css/style.css`
 2. Modify the JavaScript in the `js` folder
 3. Update the HTML structure in `index.html`
+
+## Telegram Instant View
+
+This blog includes Telegram Instant View support, allowing users to read your articles directly in the Telegram app with zero loading time.
+
+### Setting Up Instant View
+
+See the detailed instructions in [docs/telegram-instant-view.md](docs/telegram-instant-view.md) to:
+
+1. Set up an Instant View template for your blog
+2. Test and publish your template
+3. Share articles with Instant View links
+
+The Telegram share button is already included with each blog post for easy sharing.
 
 ## License
 
