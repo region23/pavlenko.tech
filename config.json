@@ -7,9 +7,9 @@
   },
   "navigation": {
     "items": [
-      {"label": "Blog", "url": "/", "active": true},
-      {"label": "Tags", "url": "/tags"},
-      {"label": "About", "url": "/about"}
+      {"label": "Блог", "url": "/", "active": true},
+      {"label": "Теги", "url": "/tags"},
+      {"label": "О блоге", "url": "/about"}
     ]
   },
   "social": {
@@ -42,7 +42,7 @@
     }
   },
   "content": {
-    "postsPerPage": 10,
+    "postsPerPage": 3,
     "showReadingTime": true,
     "defaultAuthor": "Pavel Pavlenko",
     "wordsPerMinute": 200

@@ -4,9 +4,11 @@
   "description": "Технический блог на Markdown",
   "private": true,
   "scripts": {
-    "start": "npx serve -s",
+    "start": "npx serve dist",
+    "dev": "npm run generate-static && npx serve dist",
     "update-index": "node scripts/generate-index.js",
-    "generate-static": "node scripts/generate-static.js",
+    "generate-static": "node scripts/static-site-generator.js",
+    "generate": "npm run generate-static",
     "build": "npm run update-index && npm run generate-static",
     "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
   },
@@ -23,6 +25,7 @@
     "serve": "^14.2.1"
   },
   "dependencies": {
+    "cheerio": "^1.0.0",
     "marked-gfm-heading-id": "^4.1.1",
     "marked-smartypants": "^1.1.9"
   }
