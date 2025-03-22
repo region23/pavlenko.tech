@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const { marked } = require('marked');
 const frontmatter = require('gray-matter');
+const { markedSmartypants } = require('marked-smartypants');
+const { gfmHeadingId } = require('marked-gfm-heading-id');
 
 // Constants
 const CONTENT_DIR = path.join(__dirname, '../content');
@@ -40,36 +42,38 @@ try {
  */
 function configureMarked() {
   // Custom renderer
-  const renderer = new marked.Renderer();
-  
-  // Code blocks with syntax highlighting
-  renderer.code = function(code, language) {
-    return `<pre><code class="language-${language || 'text'}">${code}</code></pre>`;
+  const renderer = {
+    // Code blocks with syntax highlighting
+    code(code, language) {
+      return `<pre><code class="language-${language || 'text'}">${code}</code></pre>`;
+    },
+    
+    // Links with proper handling
+    link(href, content, title) {
+      const titleAttr = title ? ` title="${title}"` : '';
+      // External links get target="_blank"
+      const targetAttr = typeof href === 'string' && href.startsWith('http') ? ' target="_blank" rel="noopener noreferrer"' : '';
+      return `<a href="${href}"${titleAttr}${targetAttr}>${content}</a>`;
+    },
+    
+    // Image handling
+    image(href, content, title) {
+      const titleAttr = title ? ` title="${title}"` : '';
+      return `<figure><img src="${href}" alt="${content || ''}"${titleAttr}><figcaption>${content || ''}</figcaption></figure>`;
+    }
   };
   
-  // Links with proper handling
-  renderer.link = function(href, title, text) {
-    const titleAttr = title ? ` title="${title}"` : '';
-    // External links get target="_blank"
-    const targetAttr = href.startsWith('http') ? ' target="_blank" rel="noopener noreferrer"' : '';
-    return `<a href="${href}"${titleAttr}${targetAttr}>${text}</a>`;
-  };
-  
-  // Image handling
-  renderer.image = function(href, title, text) {
-    const titleAttr = title ? ` title="${title}"` : '';
-    return `<figure><img src="${href}" alt="${text || ''}"${titleAttr}><figcaption>${text || ''}</figcaption></figure>`;
-  };
-  
-  // Set marked options
-  marked.setOptions({
+  // Set marked options with обновленным API для marked 15.x
+  marked.use({
     renderer: renderer,
     gfm: true,
     breaks: true,
-    smartLists: true,
-    smartypants: true,
-    xhtml: false
+    smartLists: true
   });
+
+  // Добавляем расширения
+  marked.use(markedSmartypants());
+  marked.use(gfmHeadingId());
 }
 
 /**
