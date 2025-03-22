@@ -1,17 +1,25 @@
 [
   {
-    "title": "Пример статьи в блоге",
+    "title": "Building Smart AI Applications: Best Practices and Patterns",
+    "date": "2025-03-15",
+    "tags": ["AI", "Development", "Best Practices", "Architecture"],
+    "summary": "A comprehensive guide to designing and implementing modern AI applications with a focus on scalability, maintainability, and ethical considerations.",
+    "slug": "modern-ai-development",
+    "file": "modern-ai-development"
+  },
+  {
+    "title": "Getting Started with Static Blog Development",
     "date": "2024-05-01",
-    "tags": ["javascript", "web"],
-    "summary": "Это пример первой статьи в блоге для демонстрации функционала.",
+    "tags": ["JavaScript", "Web", "Markdown"],
+    "summary": "An introduction to creating your own static blog with JavaScript and Markdown.",
     "slug": "hello-world",
     "file": "hello-world"
   },
   {
-    "title": "Вторая статья для примера",
+    "title": "Advanced Markdown Techniques for Developers",
     "date": "2024-04-20",
-    "tags": ["markdown", "tutorial"],
-    "summary": "Демонстрация возможностей Markdown и структуры статей.",
+    "tags": ["Markdown", "Tutorial", "Documentation"],
+    "summary": "Learn how to leverage Markdown features to create beautiful and structured documentation for your projects.",
     "slug": "example-post",
     "file": "example-post"
   }

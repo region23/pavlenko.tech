@@ -45,31 +45,36 @@ const routes = {
  */
 async function initApp() {
   try {
-    console.log("Инициализация приложения");
-    
+    console.log('Initializing app...');
+
     // Находим элемент контента
     const contentElement = document.getElementById('content');
     if (!contentElement) {
       throw new Error('Элемент контента не найден');
     }
     
-    // Инициализация роутера
+    // Инициализация маршрутизатора
     initRouter(handleRouteChange);
     
     // Загрузка данных приложения
     await loadAppData();
     
-    // Обработка текущего маршрута
-    const currentPath = getCurrentRoute();
-    handleRouteChange(currentPath);
+    // Инициализация обработчика темной темы
+    initDarkModeToggle();
     
-    console.log("Инициализация завершена");
+    // Определяем и обрабатываем текущий маршрут
+    const currentPath = getCurrentRoute();
+    await handleRouteChange(currentPath);
+    
+    console.log('App initialized successfully');
   } catch (error) {
-    console.error("Ошибка инициализации приложения:", error);
-    const errorElement = document.getElementById('error-container');
-    if (errorElement) {
-      renderError(errorElement, error);
-    }
+    console.error('Error initializing app:', error);
+    const contentContainer = document.getElementById('content');
+    renderError(contentContainer, {
+      title: 'Application Error',
+      message: 'An error occurred while initializing the application.',
+      error: error
+    });
   }
 }
 
@@ -433,8 +438,34 @@ function updateActiveNavLink(path) {
   });
 }
 
+/**
+ * Инициализирует функционал переключения темной темы
+ */
+function initDarkModeToggle() {
+  const themeToggle = document.getElementById('theme-toggle');
+  const sunIcon = themeToggle.querySelector('.sun-icon');
+  const moonIcon = themeToggle.querySelector('.moon-icon');
+  
+  // Устанавливаем правильную иконку при загрузке
+  updateThemeIcon();
+  
+  // Добавляем обработчик клика
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode);
+    updateThemeIcon();
+  });
+  
+  function updateThemeIcon() {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    sunIcon.style.display = isDarkMode ? 'none' : 'block';
+    moonIcon.style.display = isDarkMode ? 'block' : 'none';
+  }
+}
+
 // Инициализируем приложение при загрузке
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Экспорт для возможного использования в других модулях
-export { state }; 
+export { state, initDarkModeToggle }; 

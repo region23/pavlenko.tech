@@ -98,56 +98,103 @@ function renderPostTags(tags) {
  * @param {HTMLElement} container - Контейнер для вывода
  * @param {string} title - Заголовок списка (опционально)
  */
-function renderPostList(posts, container, title = 'Последние статьи') {
-  if (!container) return;
-  
-  const heading = createElement('h1', {}, title);
-  
+function renderPostList(posts, container, title = 'Latest Posts') {
   // Очищаем контейнер
   container.innerHTML = '';
-  container.appendChild(heading);
   
-  if (!posts || posts.length === 0) {
-    container.appendChild(createElement('p', {}, 'Статьи не найдены'));
+  // Добавляем заголовок
+  const titleElement = createElement('h1', {}, title);
+  container.appendChild(titleElement);
+  
+  if (!posts || !Array.isArray(posts) || posts.length === 0) {
+    const message = createElement('p', {}, 'No posts found.');
+    container.appendChild(message);
     return;
   }
   
-  const list = createElement('ul', { className: 'post-list' });
+  // Создаем список статей
+  const postList = createElement('ul', { className: 'post-list' });
   
-  // Рендерим каждую статью в списке
+  // Добавляем элементы списка
   posts.forEach(post => {
-    const slug = post.slug || post.path.split('/').pop().replace('.md', '');
-    const postUrl = `/posts/${slug}`;
+    const postItem = createElement('li', { className: 'post-item' });
+    
+    // Заголовок статьи со ссылкой
+    const postTitle = createElement('h2', { className: 'post-title' });
+    const titleLink = createElement('a', { 
+      href: `/posts/${post.slug || post.file}` 
+    }, post.title);
+    postTitle.appendChild(titleLink);
+    
+    // Мета-информация (дата)
     const formattedDate = formatDate(post.date);
     
-    const listItem = createElement('li', { className: 'post-item' });
+    // Расчет времени чтения
+    const readingTime = post.content 
+      ? calculateReadingTime(post.content) 
+      : post.summary 
+        ? calculateReadingTime(post.summary) * 3 // Примерная оценка
+        : 3; // Значение по умолчанию в минутах
     
-    // Заголовок
-    const titleEl = createElement('h2', { className: 'post-title' },
-      createElement('a', { href: postUrl }, post.title || 'Без названия')
-    );
-    listItem.appendChild(titleEl);
+    const metaContainer = createElement('div', { className: 'post-meta' });
     
-    // Дата
-    if (formattedDate) {
-      listItem.appendChild(createElement('div', { className: 'post-meta' }, formattedDate));
+    const dateElement = createElement('time', { 
+      datetime: post.date,
+    }, `${formattedDate}`);
+    
+    const readingTimeElement = createElement('span', {
+      className: 'reading-time'
+    }, `${readingTime} min read`);
+    
+    metaContainer.appendChild(dateElement);
+    metaContainer.appendChild(readingTimeElement);
+    
+    // Краткое описание статьи
+    const summary = createElement('div', { 
+      className: 'post-summary' 
+    }, post.summary || '');
+    
+    // Теги статьи
+    const tags = renderPostTags(post.tags);
+    
+    // Собираем элемент статьи
+    postItem.appendChild(postTitle);
+    postItem.appendChild(metaContainer);
+    postItem.appendChild(summary);
+    if (tags) {
+      postItem.appendChild(tags);
     }
     
-    // Описание
-    if (post.summary) {
-      listItem.appendChild(createElement('p', { className: 'post-summary' }, post.summary));
-    }
-    
-    // Теги
-    const tagsEl = renderPostTags(post.tags);
-    if (tagsEl) {
-      listItem.appendChild(tagsEl);
-    }
-    
-    list.appendChild(listItem);
+    postList.appendChild(postItem);
   });
   
-  container.appendChild(list);
+  container.appendChild(postList);
+}
+
+/**
+ * Рассчитывает примерное время чтения текста
+ * @param {string} text - Текст для расчета
+ * @param {number} wordsPerMinute - Средняя скорость чтения (слов в минуту)
+ * @returns {number} - Время чтения в минутах
+ */
+function calculateReadingTime(text, wordsPerMinute = 200) {
+  if (!text) return 1;
+  
+  // Удаляем HTML-теги и Markdown-разметку
+  const cleanText = text
+    .replace(/<[^>]*>/g, '') // Удаление HTML-тегов
+    .replace(/!\[.*?\]\(.*?\)/g, '') // Удаление Markdown-изображений
+    .replace(/\[.*?\]\(.*?\)/g, '$1') // Замена Markdown-ссылок на текст
+    .replace(/[#*_~`]/g, ''); // Удаление одиночных символов форматирования
+  
+  // Считаем количество слов
+  const words = cleanText.split(/\s+/).filter(Boolean).length;
+  
+  // Рассчитываем время чтения и округляем до целого числа
+  const minutes = Math.ceil(words / wordsPerMinute);
+  
+  // Минимум 1 минута
+  return Math.max(1, minutes);
 }
 
 /**
@@ -159,34 +206,27 @@ function renderPostList(posts, container, title = 'Последние стать
 async function renderPost(postData, content, container) {
   if (!container) return;
   
-  container.innerHTML = '<div class="loader">Загрузка статьи...</div>';
+  container.innerHTML = '<div class="loading">Loading article...</div>';
   
   try {
-    console.log('Рендеринг статьи:', postData.title);
+    console.log('Rendering article:', postData.title);
     
     if (!content) {
-      throw new Error('Не удалось загрузить содержимое статьи');
+      throw new Error('Failed to load article content');
     }
     
     // Дополнительно убеждаемся, что frontmatter полностью удален
-    // Регулярное выражение для frontmatter (более надежное)
+    // Регулярное выражение для frontmatter
     const frontmatterRegex = /^---[\s\S]*?---\s*/;
     
     // Удаляем frontmatter из контента
     const cleanContent = content.replace(frontmatterRegex, '');
     
-    console.log('Содержимое после удаления frontmatter:', cleanContent.length > 0 ? 'Не пусто' : 'Пусто');
-    
     // Удаляем заголовок первого уровня из Markdown (обычно это заголовок статьи)
-    // Ищем первый заголовок первого уровня в начале документа: # Заголовок
     const titleRegex = /^\s*# .+?\n/m;
     const contentWithoutTitle = cleanContent.replace(titleRegex, '');
     
-    console.log('Удаление заголовка статьи из Markdown контента:', 
-      contentWithoutTitle.length < cleanContent.length ? 'Заголовок удален' : 'Заголовок не найден');
-    
     // Подготавливаем код перед преобразованием
-    // Если в коде есть шаблонные строки JavaScript с ${}, предварительно экранируем их
     const preparedContent = contentWithoutTitle.replace(/```javascript\s+([\s\S]*?)```/g, (match, code) => {
       return '```javascript\n' + code.replace(/\${/g, '\\${') + '```';
     });
@@ -195,20 +235,36 @@ async function renderPost(postData, content, container) {
     const htmlContent = await renderMarkdown(preparedContent);
     
     if (!htmlContent) {
-      throw new Error('Не удалось преобразовать Markdown в HTML');
+      throw new Error('Failed to convert Markdown to HTML');
     }
     
     // Создаем разметку статьи
     const article = createElement('article', { className: 'post' });
     
-    // Создаем заголовок
+    // Создаем заголовок и метаданные
     const header = createElement('header', { className: 'post-header' });
-    header.appendChild(createElement('h1', {}, postData.title || 'Без названия'));
+    header.appendChild(createElement('h1', {}, postData.title || 'Untitled'));
+    
+    // Мета-информация
+    const metaContainer = createElement('div', { className: 'post-meta' });
     
     if (postData.date) {
-      header.appendChild(createElement('div', { className: 'post-meta' }, formatDate(postData.date)));
+      const dateElement = createElement('time', { 
+        datetime: postData.date,
+      }, formatDate(postData.date));
+      metaContainer.appendChild(dateElement);
     }
     
+    // Добавляем расчет времени чтения
+    const readingTime = calculateReadingTime(contentWithoutTitle);
+    const readingTimeElement = createElement('span', {
+      className: 'reading-time'
+    }, `${readingTime} min read`);
+    metaContainer.appendChild(readingTimeElement);
+    
+    header.appendChild(metaContainer);
+    
+    // Добавляем теги
     const tagsEl = renderPostTags(postData.tags);
     if (tagsEl) {
       header.appendChild(tagsEl);
@@ -216,42 +272,113 @@ async function renderPost(postData, content, container) {
     
     article.appendChild(header);
     
+    // Создаем оглавление, если в контенте есть заголовки
+    const headings = extractHeadings(htmlContent);
+    if (headings.length > 1) {
+      const toc = createTableOfContents(headings);
+      article.appendChild(toc);
+    }
+    
     // Добавляем содержимое статьи
     const contentElement = createElement('div', { 
-      className: 'post-content'
+      className: 'post-content',
+      innerHTML: htmlContent
     });
-    
-    // Используем innerHTML для вставки HTML-контента
-    contentElement.innerHTML = htmlContent;
     
     article.appendChild(contentElement);
     
-    // Добавляем кнопку "Назад"
-    const backButton = createElement('div', { className: 'back-link' },
-      createElement('a', { href: '/' }, '&larr; Назад к списку статей')
-    );
+    // Обработка изображений в контенте
+    processContentImages(contentElement, postData);
+    
+    // Добавляем кнопки социального шаринга
+    const shareSection = createElement('div', { className: 'social-share' });
+    const pageUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(postData.title);
+    
+    const twitterButton = createElement('a', {
+      href: `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`,
+      className: 'social-button twitter-share',
+      target: '_blank',
+      rel: 'noopener'
+    }, 'Share on Twitter');
+    
+    const linkedinButton = createElement('a', {
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`,
+      className: 'social-button linkedin-share',
+      target: '_blank',
+      rel: 'noopener'
+    }, 'Share on LinkedIn');
+    
+    shareSection.appendChild(twitterButton);
+    shareSection.appendChild(linkedinButton);
+    article.appendChild(shareSection);
     
     // Очищаем контейнер и добавляем статью
     container.innerHTML = '';
     container.appendChild(article);
-    container.appendChild(backButton);
-    
-    console.log('Статья успешно отрендерена');
-    
   } catch (error) {
-    console.error('Ошибка при рендеринге статьи:', error);
+    console.error('Error rendering article:', error);
     container.innerHTML = '';
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-container';
-    container.appendChild(errorDiv);
-    renderError(errorDiv, error);
-    
-    // Добавляем кнопку "Назад" даже при ошибке
-    const backButton = createElement('div', { className: 'back-link' },
-      createElement('a', { href: '/' }, '&larr; Назад к списку статей')
-    );
-    container.appendChild(backButton);
+    renderError(container, error);
   }
+}
+
+/**
+ * Извлекает заголовки из HTML-контента
+ * @param {string} html - HTML-контент
+ * @returns {Array} - Массив объектов с информацией о заголовках
+ */
+function extractHeadings(html) {
+  const headings = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  // Находим все заголовки h2 и h3
+  const headingElements = doc.querySelectorAll('h2, h3');
+  
+  headingElements.forEach((heading, index) => {
+    // Добавляем id к заголовку, если его нет
+    if (!heading.id) {
+      heading.id = `heading-${index}`;
+    }
+    
+    headings.push({
+      id: heading.id,
+      text: heading.textContent,
+      level: parseInt(heading.tagName.substring(1)) // Получаем число из h2, h3
+    });
+  });
+  
+  return headings;
+}
+
+/**
+ * Создает оглавление на основе заголовков
+ * @param {Array} headings - Массив объектов с информацией о заголовках
+ * @returns {HTMLElement} - HTML-элемент с оглавлением
+ */
+function createTableOfContents(headings) {
+  const toc = createElement('div', { className: 'table-of-contents' });
+  const tocTitle = createElement('h3', {}, 'Table of Contents');
+  const tocList = createElement('ul', {});
+  
+  headings.forEach(heading => {
+    const listItem = createElement('li', {
+      style: heading.level === 3 ? 'margin-left: 1rem;' : ''
+    });
+    
+    const link = createElement('a', {
+      href: `#${heading.id}`
+    }, heading.text);
+    
+    listItem.appendChild(link);
+    tocList.appendChild(listItem);
+  });
+  
+  toc.appendChild(tocTitle);
+  toc.appendChild(tocList);
+  
+  return toc;
 }
 
 /**
@@ -562,11 +689,15 @@ function openImageModal(src, alt) {
     document.addEventListener('keydown', handleKeyDown);
 }
 
-// Экспортируем публичные функции
+// Экспортируем функции
 export {
   renderPostList,
   renderPost,
   renderTagsList,
   renderAbout,
-  renderError
+  renderError,
+  formatDate,
+  calculateReadingTime,
+  extractHeadings,
+  createTableOfContents
 }; 
