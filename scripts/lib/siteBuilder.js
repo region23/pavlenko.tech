@@ -57,105 +57,84 @@ async function buildSite(options = {}) {
 
 /**
  * Load all posts from the content directory
+ * Now builds the index in memory instead of relying on a file
  */
 async function loadAllPosts() {
   const config = getConfig();
   const POSTS_DIR = config.paths.postsDir;
   
   try {
-    // Check if posts index exists
-    const indexPath = path.join(POSTS_DIR, 'index.json');
+    console.log('Loading and processing markdown files...');
     
-    let posts = [];
+    // Directly scan posts directory for markdown files
+    const files = await listFiles(POSTS_DIR, '.md');
+    console.log(`Found ${files.length} markdown files`);
     
-    if (fs.existsSync(indexPath)) {
-      // Load from index
-      const indexContent = await readFile(indexPath);
-      const indexData = JSON.parse(indexContent);
-      
-      // Load full content for each post
-      posts = await Promise.all(indexData.map(async (post) => {
-        const postPath = path.join(POSTS_DIR, `${post.file}.md`);
+    // Process each file
+    const posts = await Promise.all(files.map(async (filename) => {
+      try {
+        const filePath = path.join(POSTS_DIR, filename);
+        const content = await readFile(filePath);
         
-        if (!fs.existsSync(postPath)) {
-          console.warn(`Warning: Post file not found: ${postPath}`);
-          return null;
+        // Extract frontmatter and content
+        const { content: markdownContent, data } = extractFrontmatter(content);
+        
+        // Validate required fields
+        if (!data.title || !data.date) {
+          console.warn(`Warning: Missing required fields in ${filename}`);
+          
+          // If date is missing, use file modification date
+          if (!data.date) {
+            const stats = fs.statSync(filePath);
+            data.date = stats.mtime.toISOString().split('T')[0];
+          }
+          
+          // If title is missing, use filename
+          if (!data.title) {
+            data.title = filename.replace('.md', '').replace(/-/g, ' ');
+          }
         }
         
-        const postContent = await readFile(postPath);
-        const { content, data } = extractFrontmatter(postContent);
-        
         // Generate HTML from markdown
-        const html = renderMarkdown(content);
+        const html = renderMarkdown(markdownContent);
         
         // Calculate reading time
-        const readingTime = calculateReadingTime(content);
+        const readingTime = calculateReadingTime(markdownContent);
         
         // Format the date
         const formattedDate = formatDate(data.date);
         
         // Generate post URL
-        const url = `/posts/${post.file}/`;
-        
-        // Combine index metadata with full content
-        return {
-          ...post,
-          ...data,
-          html,
-          content,
-          readingTime,
-          formattedDate,
-          url
-        };
-      }));
-      
-      // Filter out null entries and sort by date
-      return posts
-        .filter(post => post !== null)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-    } else {
-      // Manually scan posts directory if no index
-      console.log('Posts index not found, scanning directory...');
-      
-      const files = await listFiles(POSTS_DIR, '.md');
-      
-      posts = await Promise.all(files.map(async (file) => {
-        const postPath = path.join(POSTS_DIR, file);
-        const postContent = await readFile(postPath);
-        const { content, data } = extractFrontmatter(postContent);
-        
-        // Generate HTML from markdown
-        const html = renderMarkdown(content);
-        
-        // Calculate reading time
-        const readingTime = calculateReadingTime(content);
-        
-        // Format the date
-        const formattedDate = formatDate(data.date);
-        
-        // Generate post URL
-        const fileName = file.replace('.md', '');
+        const fileName = filename.replace('.md', '');
         const url = `/posts/${fileName}/`;
         
-        // Extract post data
+        // Return complete post object
         return {
           file: fileName,
           title: data.title,
           date: data.date,
           tags: data.tags || [],
           summary: data.summary || '',
-          content,
+          content: markdownContent,
           html,
           readingTime,
           formattedDate,
           url,
           ...data
         };
-      }));
-      
-      // Sort by date
-      return posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
+      } catch (error) {
+        console.error(`Error processing file ${filename}:`, error);
+        return null;
+      }
+    }));
+    
+    // Filter out null entries and sort by date
+    const validPosts = posts
+      .filter(post => post !== null)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    console.log(`Processed ${validPosts.length} valid posts`);
+    return validPosts;
   } catch (error) {
     console.error('Error loading posts:', error);
     return [];
