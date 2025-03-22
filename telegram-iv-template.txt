@@ -1,7 +1,8 @@
 # Instant View Template for Pavlenko.Tech Blog (Version 2.1)
 
-# Only apply to post pages, not the homepage, tags, or about page
+# Apply to both dynamic and static post pages
 ?path: /posts/.+
+?path: /static/posts/.+\.html
 
 # Site info - specify your Telegram channel if you have one
 #channel: https://t.me/pavlenkodev
@@ -86,6 +87,7 @@ body: //div[contains(@class, "post-content")]
 # Remove unnecessary elements
 @remove: //div[contains(@class, "social-share")]
 @remove: //div[contains(@class, "table-of-contents")]
+@remove: //script
 
 # Handle tables if they exist
 @if_exists: //table

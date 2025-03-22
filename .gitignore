@@ -43,4 +43,9 @@ logs
 .eslintcache
 
 # Optional REPL history
-.node_repl_history 
+.node_repl_history
+
+# Generated static files
+static/posts/*.html
+# But keep the directory structure
+!static/posts/.gitkeep 

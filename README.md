@@ -12,13 +12,15 @@ A modern, lightweight static blog with a powerful configuration system, allowing
 - Automatic reading time calculation
 - Configurable appearance (colors, fonts, etc.)
 - Telegram Instant View support for fast article reading in Telegram
+- Hybrid rendering system (SPA for users, static HTML for crawlers)
 
 ## Getting Started
 
 1. Clone this repository
 2. Customize `config.json` file
 3. Add your blog posts to the `posts` folder in Markdown format
-4. Serve the blog using your preferred static hosting (GitHub Pages, Netlify, Vercel, etc.)
+4. Run `npm run build` to generate static files
+5. Serve the blog using your preferred static hosting (GitHub Pages, Netlify, Vercel, etc.)
 
 ## Configuration
 
@@ -149,6 +151,21 @@ For advanced customization beyond the configuration file, you can:
 1. Edit the CSS in `css/style.css`
 2. Modify the JavaScript in the `js` folder
 3. Update the HTML structure in `index.html`
+
+## Hybrid Rendering
+
+This blog uses a hybrid rendering approach that combines:
+
+- A dynamic Single Page Application (SPA) for human visitors
+- Pre-rendered static HTML for crawlers and bots
+
+This provides the best user experience for regular users while ensuring compatibility with services like Telegram Instant View and search engines.
+
+See the detailed documentation in [docs/hybrid-rendering.md](docs/hybrid-rendering.md) to learn:
+
+1. How the hybrid system works
+2. How to maintain static files
+3. How to test and debug
 
 ## Telegram Instant View
 

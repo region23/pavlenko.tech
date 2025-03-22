@@ -6,7 +6,9 @@
   "scripts": {
     "start": "npx serve -s",
     "update-index": "node scripts/generate-index.js",
-    "deploy": "git add . && git commit -m 'Update content' && git push"
+    "generate-static": "node scripts/generate-static.js",
+    "build": "npm run update-index && npm run generate-static",
+    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
   },
   "keywords": [
     "blog",
@@ -16,6 +18,8 @@
   "author": "Pavlenko",
   "license": "MIT",
   "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^5.1.2",
     "serve": "^14.2.1"
   }
-} 
+}
