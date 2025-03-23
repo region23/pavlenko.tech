@@ -185,8 +185,16 @@ function extractFrontmatter(content) {
 function calculateReadingTime(text) {
   if (!text) return config.readingTime.minMinutes;
   
+  // Get the global config to access content settings
+  const globalConfig = require('./configManager').getConfig();
+  
+  // Use wordsPerMinute from content config if available, otherwise use default
+  const wordsPerMinute = globalConfig.content && globalConfig.content.wordsPerMinute 
+    ? globalConfig.content.wordsPerMinute 
+    : config.readingTime.wordsPerMinute;
+  
   const words = text.trim().split(/\s+/).length;
-  const minutes = Math.ceil(words / config.readingTime.wordsPerMinute);
+  const minutes = Math.ceil(words / wordsPerMinute);
   
   return Math.max(config.readingTime.minMinutes, minutes);
 }

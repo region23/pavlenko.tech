@@ -249,17 +249,22 @@ function generateHeader(config) {
  */
 function generateFooter(config) {
   // Generate social links HTML
-  let socialLinksHtml = '';
-  if (config.social && config.social.links && config.social.links.length > 0) {
-    socialLinksHtml = config.social.links.map(link => 
+  const socialLinks = config.social && config.social.links ? 
+    config.social.links.map(link => 
       `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.platform}</a>`
-    ).join('\n');
-  }
+    ).join('') : '';
 
+  // Get current year for copyright
+  const currentYear = new Date().getFullYear();
+  
+  // Use copyright from config or generate a fallback
+  const copyright = config.site.copyright || `© ${currentYear} ${config.site.title}`;
+  
   return renderComponent('footer', {
-    current_year: new Date().getFullYear(),
     site_title: config.site.title,
-    social_links: socialLinksHtml
+    copyright: copyright,
+    current_year: currentYear,
+    social_links: socialLinks
   });
 }
 
@@ -270,11 +275,17 @@ function generateFooter(config) {
  * @returns {string} - Post HTML content
  */
 function generatePostContent(post, config) {
+  // Only show reading time if post.showReadingTime is true
+  const readingTimeDisplay = (post.showReadingTime && post.readingTime) 
+    ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` 
+    : '';
+    
   return renderComponent('post', {
     title: post.title,
     date: post.date,
     formatted_date: post.formattedDate,
-    reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
+    author: post.author || '',
+    reading_time: readingTimeDisplay,
     tags: post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '',
     content: post.html
   });
@@ -286,12 +297,18 @@ function generatePostContent(post, config) {
  * @returns {string} - Post card HTML
  */
 function generatePostCard(post) {
+  // Only show reading time if post.showReadingTime is true
+  const readingTimeDisplay = (post.showReadingTime && post.readingTime) 
+    ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` 
+    : '';
+    
   return renderComponent('post-card', {
     url: post.url,
     title: post.title,
     date: post.date,
     formatted_date: post.formattedDate,
-    reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
+    author: post.author || '',
+    reading_time: readingTimeDisplay,
     tags: post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '',
     summary: post.summary ? `<p class="post-summary">${post.summary}</p>` : ''
   });

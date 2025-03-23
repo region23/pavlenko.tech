@@ -53,6 +53,7 @@ async function writeOutput(filePath, content) {
 async function processPostFile(filePath, filename) {
   try {
     const content = await readFile(filePath);
+    const config = getConfig();
     
     // Extract frontmatter and content
     const { content: markdownContent, data } = extractFrontmatter(content);
@@ -73,11 +74,21 @@ async function processPostFile(filePath, filename) {
       console.warn(`Warning: Missing title in ${filename}, using normalized filename`);
     }
     
+    // If author is missing, use defaultAuthor from config
+    if (!postData.author && config.content && config.content.defaultAuthor) {
+      postData.author = config.content.defaultAuthor;
+    }
+    
     // Generate HTML from markdown
     const html = renderMarkdown(markdownContent);
     
     // Calculate reading time
     const readingTime = calculateReadingTime(markdownContent);
+    
+    // Should we show reading time?
+    const showReadingTime = config.content && config.content.showReadingTime !== undefined 
+      ? config.content.showReadingTime 
+      : true;
     
     // Format the date
     const formattedDate = formatDate(postData.date);
@@ -91,11 +102,13 @@ async function processPostFile(filePath, filename) {
       file: fileName,
       title: postData.title,
       date: postData.date,
+      author: postData.author || '',
       tags: postData.tags || [],
       summary: postData.summary || '',
       content: markdownContent,
       html,
       readingTime,
+      showReadingTime,
       formattedDate,
       url,
       ...postData
@@ -564,6 +577,14 @@ async function buildSite(options = {}) {
     
     if (config.templates) {
       updateTemplateConfig(config.templates);
+    }
+    
+    // Generate CSS variables from appearance config
+    try {
+      const { writeCssVariables } = require('./cssGenerator');
+      await writeCssVariables();
+    } catch (error) {
+      console.error('Error generating CSS variables:', error);
     }
     
     // Create output directory if it doesn't exist
