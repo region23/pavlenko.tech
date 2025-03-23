@@ -1,7 +1,50 @@
 /**
  * Template Engine Module
- * Handles HTML template generation for the static site generator
+ * Handles HTML template loading and rendering for the static site generator
  */
+
+const fs = require('fs');
+const path = require('path');
+
+// Template cache to improve performance
+const templateCache = {};
+
+/**
+ * Load a template file and cache it
+ * @param {string} templateName - Name of the template file without extension
+ * @returns {string} - Template content
+ */
+function loadTemplate(templateName) {
+  const templatePath = path.join(process.cwd(), 'templates', `${templateName}.html`);
+  
+  // Return from cache if available
+  if (templateCache[templatePath]) {
+    return templateCache[templatePath];
+  }
+  
+  try {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    templateCache[templatePath] = template;
+    return template;
+  } catch (error) {
+    console.error(`Error loading template ${templateName}:`, error);
+    return ''; // Return empty string on error
+  }
+}
+
+/**
+ * Replace variables in template with actual values
+ * @param {string} template - Template string with variables
+ * @param {Object} data - Data object with values to replace variables
+ * @returns {string} - Processed template with variables replaced
+ */
+function processTemplate(template, data) {
+  // Simple variable replacement using regex
+  return template.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
+    key = key.trim();
+    return data[key] !== undefined ? data[key] : '';
+  });
+}
 
 /**
  * Generate the base HTML structure
@@ -14,31 +57,27 @@
  * @returns {string} - Complete HTML document
  */
 function generatePage({ title, description, content, config, meta = {} }) {
-  return `<!DOCTYPE html>
-<html lang="${config.site.language || 'ru-RU'}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title ? `${title} | ` : ''}${config.site.title}</title>
-  <meta name="description" content="${description || config.site.description}">
-  ${meta.canonical ? `<link rel="canonical" href="${meta.canonical}">` : ''}
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
-</head>
-<body>
-  ${generateHeader(config)}
-  <main class="container">
-    ${content}
-  </main>
-  ${generateFooter(config)}
-  <script src="/js/theme.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-</body>
-</html>`;
+  // Load base template
+  const baseTemplate = loadTemplate('base');
+  
+  // Generate header and footer
+  const header = generateHeader(config);
+  const footer = generateFooter(config);
+  
+  // Prepare data for template
+  const data = {
+    language: config.site.language || 'ru-RU',
+    site_title: config.site.title,
+    title_prefix: title ? `${title} | ` : '',
+    description: description || config.site.description,
+    canonical: meta.canonical ? `<link rel="canonical" href="${meta.canonical}">` : '',
+    header: header,
+    content: content,
+    footer: footer
+  };
+  
+  // Process template with data
+  return processTemplate(baseTemplate, data);
 }
 
 /**
@@ -47,32 +86,16 @@ function generatePage({ title, description, content, config, meta = {} }) {
  * @returns {string} - Header HTML
  */
 function generateHeader(config) {
-  return `<header>
-  <nav class="container">
-    <div class="logo">
-      <a href="/">${config.site.title}</a>
-    </div>
-    <div class="nav-links">
-      <a href="/about/" class="nav-link">Обо мне</a>
-      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </div>
-  </nav>
-</header>`;
+  // Load header template
+  const headerTemplate = loadTemplate('header');
+  
+  // Prepare data for template
+  const data = {
+    site_title: config.site.title
+  };
+  
+  // Process template with data
+  return processTemplate(headerTemplate, data);
 }
 
 /**
@@ -81,14 +104,17 @@ function generateHeader(config) {
  * @returns {string} - Footer HTML
  */
 function generateFooter(config) {
-  const year = new Date().getFullYear();
-  return `<footer>
-  <div class="container">
-    <div class="footer-content">
-      <p>&copy; ${year} ${config.site.title}</p>
-    </div>
-  </div>
-</footer>`;
+  // Load footer template
+  const footerTemplate = loadTemplate('footer');
+  
+  // Prepare data for template
+  const data = {
+    current_year: new Date().getFullYear(),
+    site_title: config.site.title
+  };
+  
+  // Process template with data
+  return processTemplate(footerTemplate, data);
 }
 
 /**
@@ -98,20 +124,24 @@ function generateFooter(config) {
  * @returns {string} - Post HTML content
  */
 function generatePostContent(post, config) {
-  return `
-  <article class="post">
-    <header class="post-header">
-      <h1>${post.title}</h1>
-      <div class="post-meta">
-        <time datetime="${post.date}">${post.formattedDate}</time>
-        ${post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : ''}
-      </div>
-      ${generateTagsList(post.tags)}
-    </header>
-    <div class="post-content">
-      ${post.html}
-    </div>
-  </article>`;
+  // Load post template
+  const postTemplate = loadTemplate('post');
+  
+  // Generate tags HTML
+  const tags = post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '';
+  
+  // Prepare data for template
+  const data = {
+    title: post.title,
+    date: post.date,
+    formatted_date: post.formattedDate,
+    reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
+    tags: tags,
+    content: post.html
+  };
+  
+  // Process template with data
+  return processTemplate(postTemplate, data);
 }
 
 /**
@@ -120,16 +150,25 @@ function generatePostContent(post, config) {
  * @returns {string} - Post card HTML
  */
 function generatePostCard(post) {
-  return `
-  <article class="post-card">
-    <h2><a href="${post.url}">${post.title}</a></h2>
-    <div class="post-meta">
-      <time datetime="${post.date}">${post.formattedDate}</time>
-      ${post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : ''}
-    </div>
-    ${generateTagsList(post.tags)}
-    ${post.summary ? `<p class="post-summary">${post.summary}</p>` : ''}
-  </article>`;
+  // Load post-card template
+  const postCardTemplate = loadTemplate('post-card');
+  
+  // Generate tags HTML
+  const tags = post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '';
+  
+  // Prepare data for template
+  const data = {
+    url: post.url,
+    title: post.title,
+    date: post.date,
+    formatted_date: post.formattedDate,
+    reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
+    tags: tags,
+    summary: post.summary ? `<p class="post-summary">${post.summary}</p>` : ''
+  };
+  
+  // Process template with data
+  return processTemplate(postCardTemplate, data);
 }
 
 /**
@@ -140,11 +179,21 @@ function generatePostCard(post) {
 function generateTagsList(tags) {
   if (!tags || tags.length === 0) return '';
   
+  // Load tags template
+  const tagsTemplate = loadTemplate('tags');
+  
+  // Generate individual tag links
   const tagLinks = tags.map(tag => 
     `<a href="/tags/${encodeURIComponent(tag)}/" class="tag">${tag}</a>`
   ).join('');
   
-  return `<div class="tags">${tagLinks}</div>`;
+  // Prepare data for template
+  const data = {
+    tag_links: tagLinks
+  };
+  
+  // Process template with data
+  return processTemplate(tagsTemplate, data);
 }
 
 /**
@@ -158,18 +207,17 @@ function generateTagsList(tags) {
 function generatePagination({ currentPage, totalPages, basePath }) {
   if (totalPages <= 1) return '';
   
-  let paginationHtml = '<div class="pagination">';
+  // Load pagination template
+  const paginationTemplate = loadTemplate('pagination');
   
   // Previous page link
+  let prevLink;
   if (currentPage > 1) {
     const prevUrl = currentPage === 2 ? basePath : `${basePath}page/${currentPage - 1}/`;
-    paginationHtml += `<a href="${prevUrl}" class="pagination-item pagination-prev">← Предыдущая</a>`;
+    prevLink = `<a href="${prevUrl}" class="pagination-item pagination-prev">← Предыдущая</a>`;
   } else {
-    paginationHtml += '<span class="pagination-item pagination-prev disabled">← Предыдущая</span>';
+    prevLink = '<span class="pagination-item pagination-prev disabled">← Предыдущая</span>';
   }
-  
-  // Page number links
-  paginationHtml += '<div class="pagination-numbers">';
   
   // Calculate range of pages to show
   const range = 2;
@@ -185,44 +233,52 @@ function generatePagination({ currentPage, totalPages, basePath }) {
     }
   }
   
+  // Page number links
+  let pageLinks = '';
+  
   // First page link if not in range
   if (startPage > 1) {
-    paginationHtml += `<a href="${basePath}" class="pagination-item">1</a>`;
+    pageLinks += `<a href="${basePath}" class="pagination-item">1</a>`;
     if (startPage > 2) {
-      paginationHtml += '<span class="pagination-ellipsis">...</span>';
+      pageLinks += '<span class="pagination-ellipsis">...</span>';
     }
   }
   
   // Page links
   for (let i = startPage; i <= endPage; i++) {
     if (i === currentPage) {
-      paginationHtml += `<span class="pagination-item pagination-current">${i}</span>`;
+      pageLinks += `<span class="pagination-item pagination-current">${i}</span>`;
     } else {
       const pageUrl = i === 1 ? basePath : `${basePath}page/${i}/`;
-      paginationHtml += `<a href="${pageUrl}" class="pagination-item">${i}</a>`;
+      pageLinks += `<a href="${pageUrl}" class="pagination-item">${i}</a>`;
     }
   }
   
   // Last page link if not in range
   if (endPage < totalPages) {
     if (endPage < totalPages - 1) {
-      paginationHtml += '<span class="pagination-ellipsis">...</span>';
+      pageLinks += '<span class="pagination-ellipsis">...</span>';
     }
-    paginationHtml += `<a href="${basePath}page/${totalPages}/" class="pagination-item">${totalPages}</a>`;
+    pageLinks += `<a href="${basePath}page/${totalPages}/" class="pagination-item">${totalPages}</a>`;
   }
-  
-  paginationHtml += '</div>';
   
   // Next page link
+  let nextLink;
   if (currentPage < totalPages) {
-    paginationHtml += `<a href="${basePath}page/${currentPage + 1}/" class="pagination-item pagination-next">Следующая →</a>`;
+    nextLink = `<a href="${basePath}page/${currentPage + 1}/" class="pagination-item pagination-next">Следующая →</a>`;
   } else {
-    paginationHtml += '<span class="pagination-item pagination-next disabled">Следующая →</span>';
+    nextLink = '<span class="pagination-item pagination-next disabled">Следующая →</span>';
   }
   
-  paginationHtml += '</div>';
+  // Prepare data for template
+  const data = {
+    prev_link: prevLink,
+    page_links: pageLinks,
+    next_link: nextLink
+  };
   
-  return paginationHtml;
+  // Process template with data
+  return processTemplate(paginationTemplate, data);
 }
 
 module.exports = {
@@ -232,5 +288,7 @@ module.exports = {
   generatePostContent,
   generatePostCard,
   generateTagsList,
-  generatePagination
+  generatePagination,
+  loadTemplate,
+  processTemplate
 }; 

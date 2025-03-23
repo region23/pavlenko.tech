@@ -14,7 +14,9 @@ const {
   generatePage, 
   generatePostContent, 
   generatePostCard, 
-  generatePagination 
+  generatePagination,
+  loadTemplate,
+  processTemplate
 } = require('./templateEngine');
 
 /**
@@ -381,15 +383,12 @@ async function buildErrorPage() {
   const config = getConfig();
   
   try {
-    // Generate page content
-    const content = `
-      <div class="error-page">
-        <h1>404</h1>
-        <h2>Страница не найдена</h2>
-        <p>Страница, которую вы запрашиваете, не существует.</p>
-        <p><a href="/" class="button">Вернуться на главную</a></p>
-      </div>
-    `;
+    // Load error template from templateEngine
+    const { loadTemplate, processTemplate } = require('./templateEngine');
+    const errorTemplate = loadTemplate('error');
+    
+    // Generate content using the error template
+    const content = processTemplate(errorTemplate, {});
     
     // Generate full page HTML
     const html = generatePage({
