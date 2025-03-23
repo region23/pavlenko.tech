@@ -2,8 +2,6 @@
 title: "About Me"
 ---
 
-# About Me
-
 Hello! I'm Alex Pavlenko, a software engineer and AI enthusiast passionate about building intelligent and user-friendly applications. This blog is where I share my knowledge, experiences, and insights about software development and artificial intelligence.
 
 ## My Expertise

@@ -368,8 +368,57 @@ async function buildTagPages(posts, options = {}) {
       const tagDir = path.join(config.paths.outputDir, 'tags', encodeURIComponent(tag));
       await writeOutput(path.join(tagDir, 'index.html'), html);
     }));
+
+    // Build the main tags index page
+    await buildTagsIndexPage(tags, options);
   } catch (error) {
     console.error('Error building tag pages:', error);
+    throw error;
+  }
+}
+
+/**
+ * Build tags index page
+ * @param {Object} tags - Object with tags as keys and arrays of posts as values
+ * @param {Object} options - Build options
+ */
+async function buildTagsIndexPage(tags, options = {}) {
+  const config = getConfig();
+  
+  try {
+    log('Building tags index page...', options);
+    
+    // Create tag links with post counts
+    const tagLinks = Object.entries(tags)
+      .sort(([tagA], [tagB]) => tagA.localeCompare(tagB))
+      .map(([tag, posts]) => {
+        return `<a href="/tags/${encodeURIComponent(tag)}/" class="tag">${tag} (${posts.length})</a>`;
+      })
+      .join('\n');
+    
+    // Generate page content using the tags template
+    const content = `
+      <div class="tags-page">
+        <h1 class="page-title">Теги</h1>
+        <div class="tags">
+          ${tagLinks}
+        </div>
+      </div>
+    `;
+    
+    // Generate full page HTML
+    const html = generatePage({
+      title: 'Теги | ' + config.site.title,
+      description: 'Все теги блога',
+      content,
+      config
+    });
+    
+    // Create directory and write file
+    const tagsDir = path.join(config.paths.outputDir, 'tags');
+    await writeOutput(path.join(tagsDir, 'index.html'), html);
+  } catch (error) {
+    console.error('Error building tags index page:', error);
     throw error;
   }
 }
@@ -552,6 +601,7 @@ module.exports = {
   buildHomePage,
   buildPostPages,
   buildTagPages,
+  buildTagsIndexPage,
   buildAboutPage,
   buildErrorPage,
   buildSitemap

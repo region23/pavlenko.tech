@@ -68,6 +68,94 @@ function loadTemplate(templateName) {
 }
 
 /**
+ * Get nested property from object using a path string (e.g. "user.profile.name")
+ * @param {Object} obj - Object to get value from
+ * @param {string} path - Path to property
+ * @returns {*} - Value or undefined
+ */
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((prev, curr) => {
+    return prev ? prev[curr] : undefined;
+  }, obj);
+}
+
+/**
+ * Process {{#each items}} blocks in template
+ * @param {string} template - Template string with #each blocks
+ * @param {Object} data - Data object with values
+ * @returns {string} - Processed template with #each blocks resolved
+ */
+function processEachBlocks(template, data) {
+  const eachRegex = /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g;
+  
+  return template.replace(eachRegex, (match, itemsPath, blockContent) => {
+    const items = getNestedValue(data, itemsPath.trim());
+    
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return '';
+    }
+    
+    return items.map(item => {
+      // Process the block content with the item as context
+      // Also pass the original data as context under _parent
+      return processTemplate(blockContent, {
+        ...item,
+        _parent: data,
+        _index: items.indexOf(item)
+      });
+    }).join('');
+  });
+}
+
+/**
+ * Process {{#if condition}} blocks in template
+ * @param {string} template - Template string with #if blocks
+ * @param {Object} data - Data object with values
+ * @returns {string} - Processed template with #if blocks resolved
+ */
+function processIfBlocks(template, data) {
+  const ifRegex = /\{\{#if\s+([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
+  
+  return template.replace(ifRegex, (match, condition, ifContent, elseContent = '') => {
+    let result = false;
+    
+    // If condition is a path to a value
+    if (condition.trim().indexOf(' ') === -1) {
+      result = !!getNestedValue(data, condition.trim());
+    } else {
+      // For more complex conditions in the future, could use a safe eval approach
+      try {
+        // For now, just handle simple equality/inequality operations
+        const [left, operator, right] = condition.trim().split(/\s+/);
+        const leftValue = getNestedValue(data, left) || left;
+        const rightValue = getNestedValue(data, right) || right;
+        
+        switch (operator) {
+          case '==':
+            result = leftValue == rightValue;
+            break;
+          case '===':
+            result = leftValue === rightValue;
+            break;
+          case '!=':
+            result = leftValue != rightValue;
+            break;
+          case '!==':
+            result = leftValue !== rightValue;
+            break;
+          default:
+            result = !!getNestedValue(data, condition.trim());
+        }
+      } catch (e) {
+        result = false;
+      }
+    }
+    
+    return result ? processTemplate(ifContent, data) : processTemplate(elseContent, data);
+  });
+}
+
+/**
  * Replace variables in template with actual values
  * @param {string} template - Template string with variables
  * @param {Object} data - Data object with values to replace variables
@@ -76,10 +164,15 @@ function loadTemplate(templateName) {
 function processTemplate(template, data) {
   if (!template) return '';
   
-  // Simple variable replacement using regex
-  return template.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
+  // Process control structures first
+  let processed = template;
+  processed = processEachBlocks(processed, data);
+  processed = processIfBlocks(processed, data);
+  
+  // Then process simple variable replacements
+  return processed.replace(/\{\{([^#/][^}]*)\}\}/g, (match, key) => {
     key = key.trim();
-    const value = data[key];
+    const value = getNestedValue(data, key);
     
     if (value === undefined) {
       return ''; // Empty string for undefined values
@@ -143,7 +236,9 @@ function generatePage({ title, description, content, config, meta = {} }) {
  */
 function generateHeader(config) {
   return renderComponent('header', {
-    site_title: config.site.title
+    site_title: config.site.title,
+    site_description: config.site.description,
+    navigation: config.navigation
   });
 }
 
@@ -153,9 +248,18 @@ function generateHeader(config) {
  * @returns {string} - Footer HTML
  */
 function generateFooter(config) {
+  // Generate social links HTML
+  let socialLinksHtml = '';
+  if (config.social && config.social.links && config.social.links.length > 0) {
+    socialLinksHtml = config.social.links.map(link => 
+      `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.platform}</a>`
+    ).join('\n');
+  }
+
   return renderComponent('footer', {
     current_year: new Date().getFullYear(),
-    site_title: config.site.title
+    site_title: config.site.title,
+    social_links: socialLinksHtml
   });
 }
 
@@ -309,22 +413,22 @@ function generatePagination({ currentPage, totalPages, basePath }) {
   
   return renderComponent('pagination', {
     prev_link: prevLink,
-    page_links: pageLinks,
+    current_page: currentPage,
+    total_pages: totalPages,
     next_link: nextLink
   });
 }
 
 module.exports = {
+  updateConfig,
+  loadTemplate,
+  processTemplate,
+  renderComponent,
   generatePage,
   generateHeader,
   generateFooter,
   generatePostContent,
   generatePostCard,
-  generateTagsList,
   generatePagination,
-  loadTemplate,
-  processTemplate,
-  renderComponent,
-  updateConfig,
-  clearCache
+  generateTagsList
 }; 

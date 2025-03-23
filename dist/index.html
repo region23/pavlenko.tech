@@ -17,11 +17,16 @@
   <nav class="container">
     <div class="logo">
       <a href="/">Pavlenko.Tech</a>
+      <div class="site-description">Авторский блог Павла Павленко про разработку и AI</div>
     </div>
     <div class="nav-links">
-      <a href="/blog/" class="nav-link">Blog</a>
-      <a href="/tags/" class="nav-link">Tags</a>
-      <a href="/about/" class="nav-link">About</a>
+      
+        <a href="/" class="nav-link active">Блог</a>
+      
+        <a href="/tags" class="nav-link ">Теги</a>
+      
+        <a href="/about" class="nav-link ">О блоге</a>
+      
     </div>
     <div class="theme-toggle-container">
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
@@ -86,9 +91,7 @@
 </article> 
           <div class="pagination">
   <span class="pagination-item pagination-prev disabled">← Предыдущая</span>
-  <div class="pagination-numbers">
-    <span class="pagination-item pagination-current">1</span><a href="/page/2/" class="pagination-item">2</a><a href="/page/3/" class="pagination-item">3</a>
-  </div>
+  <div class="pagination-counter">Страница 1 из 3</div>
   <a href="/page/2/" class="pagination-item pagination-next">Следующая →</a>
 </div> 
         </div>
@@ -98,10 +101,16 @@
   <div class="container">
     <div class="footer-content">
       <p>&copy; 2025 Pavlenko.Tech</p>
+      <div class="social-links">
+        <a href="https://github.com/pavlenko" target="_blank" rel="noopener noreferrer">GitHub</a>
+<a href="https://twitter.com/pavlenko" target="_blank" rel="noopener noreferrer">Twitter</a>
+<a href="https://linkedin.com/in/pavlenko" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
     </div>
   </div>
 </footer> 
   <script src="/js/theme.js"></script>
+  <script src="/js/scroll-effects.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>

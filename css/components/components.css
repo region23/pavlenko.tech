@@ -194,19 +194,33 @@
   background-color: rgba(59, 130, 246, 0.3);
 }
 
+/* Tags page specific styles */
+.tags-page {
+  padding: var(--space-md) 0;
+}
+
+.tags-page .tags {
+  margin-top: var(--space-md);
+}
+
+.tags-page .page-title {
+  margin-bottom: var(--space-md);
+}
+
 /* Pagination */
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: var(--space-xl);
+  margin-top: calc(var(--space-lg) / 3);
+  margin-bottom: var(--space-xl);
   flex-wrap: wrap;
   gap: var(--space-md);
 }
 
-.pagination-numbers {
-  display: flex;
-  gap: var(--space-xs);
+.pagination-counter {
+  font-size: 0.875rem;
+  color: var(--secondary-color);
 }
 
 .pagination-item {
