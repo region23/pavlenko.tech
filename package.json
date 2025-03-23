@@ -6,9 +6,10 @@
   "scripts": {
     "start": "npx serve dist",
     "dev": "npm run generate-static && npx serve dist",
-    "generate-static": "node scripts/static-site-generator.js",
+    "generate-static": "node scripts/lib/build.js",
     "build": "npm run generate-static",
-    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
+    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push",
+    "test": "node scripts/tests/test-build.js"
   },
   "keywords": [
     "blog",

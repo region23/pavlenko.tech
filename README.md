@@ -1,20 +1,33 @@
 # Static Blog Generator
 
-A modern, lightweight static blog with a powerful configuration system, allowing customization without editing code.
+A modern, lightweight static blog with a modular architecture, high performance, and a powerful configuration system, allowing customization without editing code.
 
 ## Features
 
 - Fully configurable through a single `config.json` file
+- Modular architecture with clean separation of concerns
+- Efficient caching system for markdown rendering and file operations
 - Static site generation for fast loading and best SEO practices
 - Responsive design for mobile and desktop
 - Dark mode support
 - Tag-based categorization
 - Markdown content with code highlighting
 - Automatic reading time calculation
+- Table of contents generation
 - Configurable appearance (colors, fonts, etc.)
 - Automatic pagination based on config settings
 - Sitemap.xml generation for better SEO
 - Lightning-fast performance with minimal JavaScript
+
+## Architecture
+
+The project follows a modular architecture with clear separation of concerns:
+
+- **markdownProcessor.js** - Handles markdown parsing, frontmatter extraction, and rendering
+- **fileHandler.js** - Manages all file system operations with efficient caching
+- **configManager.js** - Handles configuration loading, validation, and schema checking
+- **templateEngine.js** - Provides flexible HTML template rendering
+- **siteBuilder.js** - Orchestrates the site building process
 
 ## Getting Started
 
@@ -33,6 +46,7 @@ A modern, lightweight static blog with a powerful configuration system, allowing
 - `npm run generate-static` - Generate the static site
 - `npm run build` - Update the index and generate the static site
 - `npm run deploy` - Build, commit and push to GitHub (triggers automatic deployment)
+- `npm run test` - Run the test script to verify the functionality of all modules
 
 ## Configuration
 
@@ -46,7 +60,7 @@ The blog is fully customizable through the `config.json` file. You can modify th
   "description": "Your blog description here",
   "language": "en",
   "copyright": "© 2025 Your Name",
-  "hostname": "your-domain.com"
+  "url": "https://your-domain.com"
 }
 ```
 
@@ -129,6 +143,36 @@ The blog is fully customizable through the `config.json` file. You can modify th
 }
 ```
 
+### Advanced Module Configuration
+
+You can also configure the individual modules:
+
+```json
+"markdown": {
+  "cacheRendering": true,
+  "readingTime": {
+    "wordsPerMinute": 200,
+    "minMinutes": 1
+  },
+  "dateFormat": {
+    "locale": "en-US",
+    "options": {
+      "year": "numeric",
+      "month": "long",
+      "day": "numeric"
+    }
+  }
+},
+"templates": {
+  "cacheTemplates": true,
+  "templatesDir": "templates"
+},
+"files": {
+  "enableCache": true,
+  "cacheTTL": 60000
+}
+```
+
 ## Blog Post Format
 
 Create Markdown files in the `content/posts` folder with the following frontmatter:
@@ -147,37 +191,65 @@ Your post content in Markdown format...
 
 ## How It Works
 
-This blog now uses a static site generation approach:
+This blog uses an optimized static site generation approach:
 
 1. All content is written in Markdown with frontmatter
-2. The static generator processes Markdown content and generates HTML files
-3. Pagination is pre-rendered based on the `postsPerPage` setting in the config
-4. A minimal amount of JavaScript is included for:
-   - Dark mode toggle
-   - Optional interactive elements
-5. All pages are generated as static HTML, resulting in:
-   - Faster page loads
-   - Better SEO
-   - Improved security
-   - Lower hosting costs
+2. The `configManager` loads and validates the site configuration
+3. The `markdownProcessor` renders Markdown content to HTML with caching for improved performance
+4. The `templateEngine` handles HTML template rendering with component-based approach
+5. The `fileHandler` manages all file operations with caching and parallel processing
+6. The `siteBuilder` orchestrates the whole process, generating:
+   - Home page with pagination
+   - Individual post pages
+   - Tag pages
+   - About page
+   - 404 error page
+   - Sitemap.xml
 
-## Automated Deployment
+The generated static site offers:
+- Faster page loads
+- Better SEO
+- Improved security
+- Lower hosting costs
 
-The blog includes GitHub Actions configuration for automatic deployment:
+## Performance Optimizations
 
-1. Commit and push your changes to the main branch
-2. GitHub Actions will build the static site
-3. The built site will be deployed to GitHub Pages
+The codebase includes several performance optimizations:
 
-You can customize the deployment in the `.github/workflows/build-deploy.yml` file.
+1. **Caching System:**
+   - Markdown rendering results are cached
+   - Frequently accessed files are cached
+   - Templates are cached for repeated use
+
+2. **Parallel Processing:**
+   - Multiple site sections are built in parallel
+   - File operations use Promise.all for concurrency
+
+3. **Efficient File Operations:**
+   - Native Node.js APIs for optimal performance
+   - Smart detection of file changes
+
+4. **Reduced Code Duplication:**
+   - Reusable components and functions
+   - Centralized error handling
+
+## Testing
+
+The project includes a test script to verify the functionality of all modules:
+
+```
+npm run test
+```
+
+This will run a complete site build with verbose logging to ensure all components work correctly together.
 
 ## Customization
 
 For advanced customization beyond the configuration file, you can:
 
 1. Edit the CSS in `css/style.css`
-2. Modify the static site generator in `scripts/static-site-generator.js`
-3. Update the JavaScript in the `js` folder
+2. Modify the templates in the `templates` folder
+3. Extend the static site generator modules in `scripts/lib`
 
 ## License
 

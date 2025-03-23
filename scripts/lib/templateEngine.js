@@ -9,22 +9,57 @@ const path = require('path');
 // Template cache to improve performance
 const templateCache = {};
 
+// Default configuration
+const DEFAULT_CONFIG = {
+  cacheTemplates: true,
+  templatesDir: 'templates',
+  defaultLanguage: 'ru-RU'
+};
+
+// Module configuration
+let config = { ...DEFAULT_CONFIG };
+
+/**
+ * Update template engine configuration
+ * @param {Object} newConfig - New configuration options
+ */
+function updateConfig(newConfig = {}) {
+  config = { ...DEFAULT_CONFIG, ...newConfig };
+  
+  // Clear cache if disabled
+  if (!config.cacheTemplates) {
+    clearCache();
+  }
+}
+
+/**
+ * Clear the template cache
+ */
+function clearCache() {
+  Object.keys(templateCache).forEach(key => delete templateCache[key]);
+}
+
 /**
  * Load a template file and cache it
  * @param {string} templateName - Name of the template file without extension
  * @returns {string} - Template content
  */
 function loadTemplate(templateName) {
-  const templatePath = path.join(process.cwd(), 'templates', `${templateName}.html`);
+  const templatePath = path.join(process.cwd(), config.templatesDir, `${templateName}.html`);
   
-  // Return from cache if available
-  if (templateCache[templatePath]) {
+  // Return from cache if available and caching is enabled
+  if (config.cacheTemplates && templateCache[templatePath]) {
     return templateCache[templatePath];
   }
   
   try {
     const template = fs.readFileSync(templatePath, 'utf-8');
-    templateCache[templatePath] = template;
+    
+    // Cache template if caching is enabled
+    if (config.cacheTemplates) {
+      templateCache[templatePath] = template;
+    }
+    
     return template;
   } catch (error) {
     console.error(`Error loading template ${templateName}:`, error);
@@ -39,11 +74,39 @@ function loadTemplate(templateName) {
  * @returns {string} - Processed template with variables replaced
  */
 function processTemplate(template, data) {
+  if (!template) return '';
+  
   // Simple variable replacement using regex
   return template.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
     key = key.trim();
-    return data[key] !== undefined ? data[key] : '';
+    const value = data[key];
+    
+    if (value === undefined) {
+      return ''; // Empty string for undefined values
+    } else if (typeof value === 'function') {
+      return value(); // Execute functions
+    } else {
+      return value;
+    }
   });
+}
+
+/**
+ * Generic component renderer that handles loading template and processing with data
+ * @param {string} templateName - Template name to use
+ * @param {Object} data - Data to use for template variables
+ * @param {Function} preprocessor - Optional function to preprocess data before rendering
+ * @returns {string} - Rendered HTML
+ */
+function renderComponent(templateName, data = {}, preprocessor = null) {
+  // Load the template
+  const template = loadTemplate(templateName);
+  
+  // Apply preprocessor if provided
+  const processedData = preprocessor ? preprocessor(data) : data;
+  
+  // Process template with data
+  return processTemplate(template, processedData);
 }
 
 /**
@@ -57,16 +120,12 @@ function processTemplate(template, data) {
  * @returns {string} - Complete HTML document
  */
 function generatePage({ title, description, content, config, meta = {} }) {
-  // Load base template
-  const baseTemplate = loadTemplate('base');
-  
   // Generate header and footer
   const header = generateHeader(config);
   const footer = generateFooter(config);
   
-  // Prepare data for template
-  const data = {
-    language: config.site.language || 'ru-RU',
+  return renderComponent('base', {
+    language: config.site.language || config.defaultLanguage,
     site_title: config.site.title,
     title_prefix: title ? `${title} | ` : '',
     description: description || config.site.description,
@@ -74,10 +133,7 @@ function generatePage({ title, description, content, config, meta = {} }) {
     header: header,
     content: content,
     footer: footer
-  };
-  
-  // Process template with data
-  return processTemplate(baseTemplate, data);
+  });
 }
 
 /**
@@ -86,16 +142,9 @@ function generatePage({ title, description, content, config, meta = {} }) {
  * @returns {string} - Header HTML
  */
 function generateHeader(config) {
-  // Load header template
-  const headerTemplate = loadTemplate('header');
-  
-  // Prepare data for template
-  const data = {
+  return renderComponent('header', {
     site_title: config.site.title
-  };
-  
-  // Process template with data
-  return processTemplate(headerTemplate, data);
+  });
 }
 
 /**
@@ -104,17 +153,10 @@ function generateHeader(config) {
  * @returns {string} - Footer HTML
  */
 function generateFooter(config) {
-  // Load footer template
-  const footerTemplate = loadTemplate('footer');
-  
-  // Prepare data for template
-  const data = {
+  return renderComponent('footer', {
     current_year: new Date().getFullYear(),
     site_title: config.site.title
-  };
-  
-  // Process template with data
-  return processTemplate(footerTemplate, data);
+  });
 }
 
 /**
@@ -124,24 +166,14 @@ function generateFooter(config) {
  * @returns {string} - Post HTML content
  */
 function generatePostContent(post, config) {
-  // Load post template
-  const postTemplate = loadTemplate('post');
-  
-  // Generate tags HTML
-  const tags = post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '';
-  
-  // Prepare data for template
-  const data = {
+  return renderComponent('post', {
     title: post.title,
     date: post.date,
     formatted_date: post.formattedDate,
     reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
-    tags: tags,
+    tags: post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '',
     content: post.html
-  };
-  
-  // Process template with data
-  return processTemplate(postTemplate, data);
+  });
 }
 
 /**
@@ -150,25 +182,15 @@ function generatePostContent(post, config) {
  * @returns {string} - Post card HTML
  */
 function generatePostCard(post) {
-  // Load post-card template
-  const postCardTemplate = loadTemplate('post-card');
-  
-  // Generate tags HTML
-  const tags = post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '';
-  
-  // Prepare data for template
-  const data = {
+  return renderComponent('post-card', {
     url: post.url,
     title: post.title,
     date: post.date,
     formatted_date: post.formattedDate,
     reading_time: post.readingTime ? `<span class="reading-time">${post.readingTime} мин. чтения</span>` : '',
-    tags: tags,
+    tags: post.tags && post.tags.length > 0 ? generateTagsList(post.tags) : '',
     summary: post.summary ? `<p class="post-summary">${post.summary}</p>` : ''
-  };
-  
-  // Process template with data
-  return processTemplate(postCardTemplate, data);
+  });
 }
 
 /**
@@ -179,21 +201,43 @@ function generatePostCard(post) {
 function generateTagsList(tags) {
   if (!tags || tags.length === 0) return '';
   
-  // Load tags template
-  const tagsTemplate = loadTemplate('tags');
-  
   // Generate individual tag links
   const tagLinks = tags.map(tag => 
     `<a href="/tags/${encodeURIComponent(tag)}/" class="tag">${tag}</a>`
   ).join('');
   
-  // Prepare data for template
-  const data = {
+  return renderComponent('tags', {
     tag_links: tagLinks
-  };
+  });
+}
+
+/**
+ * Calculate pagination range
+ * @param {Object} options - Pagination options
+ * @returns {Object} - Pagination data
+ */
+function calculatePagination({ currentPage, totalPages, range = 2 }) {
+  // Calculate range of pages to show
+  let startPage = Math.max(1, currentPage - range);
+  let endPage = Math.min(totalPages, currentPage + range);
   
-  // Process template with data
-  return processTemplate(tagsTemplate, data);
+  // Ensure we always show at least 5 pages if available
+  if (endPage - startPage < 4 && totalPages > 4) {
+    if (startPage === 1) {
+      endPage = Math.min(startPage + 4, totalPages);
+    } else if (endPage === totalPages) {
+      startPage = Math.max(endPage - 4, 1);
+    }
+  }
+  
+  return {
+    startPage,
+    endPage,
+    showFirst: startPage > 1,
+    showFirstEllipsis: startPage > 2,
+    showLast: endPage < totalPages,
+    showLastEllipsis: endPage < totalPages - 1
+  };
 }
 
 /**
@@ -207,8 +251,15 @@ function generateTagsList(tags) {
 function generatePagination({ currentPage, totalPages, basePath }) {
   if (totalPages <= 1) return '';
   
-  // Load pagination template
-  const paginationTemplate = loadTemplate('pagination');
+  // Calculate pagination range
+  const { 
+    startPage, 
+    endPage, 
+    showFirst, 
+    showFirstEllipsis, 
+    showLast, 
+    showLastEllipsis 
+  } = calculatePagination({ currentPage, totalPages });
   
   // Previous page link
   let prevLink;
@@ -219,27 +270,13 @@ function generatePagination({ currentPage, totalPages, basePath }) {
     prevLink = '<span class="pagination-item pagination-prev disabled">← Предыдущая</span>';
   }
   
-  // Calculate range of pages to show
-  const range = 2;
-  let startPage = Math.max(1, currentPage - range);
-  let endPage = Math.min(totalPages, currentPage + range);
-  
-  // Ensure we always show at least 5 pages if available
-  if (endPage - startPage < 4 && totalPages > 4) {
-    if (startPage === 1) {
-      endPage = Math.min(startPage + 4, totalPages);
-    } else if (endPage === totalPages) {
-      startPage = Math.max(endPage - 4, 1);
-    }
-  }
-  
   // Page number links
   let pageLinks = '';
   
   // First page link if not in range
-  if (startPage > 1) {
+  if (showFirst) {
     pageLinks += `<a href="${basePath}" class="pagination-item">1</a>`;
-    if (startPage > 2) {
+    if (showFirstEllipsis) {
       pageLinks += '<span class="pagination-ellipsis">...</span>';
     }
   }
@@ -255,8 +292,8 @@ function generatePagination({ currentPage, totalPages, basePath }) {
   }
   
   // Last page link if not in range
-  if (endPage < totalPages) {
-    if (endPage < totalPages - 1) {
+  if (showLast) {
+    if (showLastEllipsis) {
       pageLinks += '<span class="pagination-ellipsis">...</span>';
     }
     pageLinks += `<a href="${basePath}page/${totalPages}/" class="pagination-item">${totalPages}</a>`;
@@ -270,15 +307,11 @@ function generatePagination({ currentPage, totalPages, basePath }) {
     nextLink = '<span class="pagination-item pagination-next disabled">Следующая →</span>';
   }
   
-  // Prepare data for template
-  const data = {
+  return renderComponent('pagination', {
     prev_link: prevLink,
     page_links: pageLinks,
     next_link: nextLink
-  };
-  
-  // Process template with data
-  return processTemplate(paginationTemplate, data);
+  });
 }
 
 module.exports = {
@@ -290,5 +323,8 @@ module.exports = {
   generateTagsList,
   generatePagination,
   loadTemplate,
-  processTemplate
+  processTemplate,
+  renderComponent,
+  updateConfig,
+  clearCache
 }; 

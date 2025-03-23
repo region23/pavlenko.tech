@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>undefined/</loc>
+    <loc>https://pavlenko.tech/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>undefined/about/</loc>
+    <loc>https://pavlenko.tech/about/</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>undefined/posts/lalala copy/</loc>
+    <loc>https://pavlenko.tech/posts/lalala copy/</loc>
     <lastmod>2025-03-22</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/lalala/</loc>
+    <loc>https://pavlenko.tech/posts/lalala/</loc>
     <lastmod>2025-03-22</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/latutut copy 2/</loc>
+    <loc>https://pavlenko.tech/posts/latutut copy 2/</loc>
     <lastmod>2025-03-21</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/latutut copy/</loc>
+    <loc>https://pavlenko.tech/posts/latutut copy/</loc>
     <lastmod>2025-03-21</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/latutut/</loc>
+    <loc>https://pavlenko.tech/posts/latutut/</loc>
     <lastmod>2025-03-21</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/modern-ai-development/</loc>
+    <loc>https://pavlenko.tech/posts/modern-ai-development/</loc>
     <lastmod>2025-03-15</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/hello-world/</loc>
+    <loc>https://pavlenko.tech/posts/hello-world/</loc>
     <lastmod>2024-05-01</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/posts/example-post/</loc>
+    <loc>https://pavlenko.tech/posts/example-post/</loc>
     <lastmod>2024-04-20</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>undefined/tags/Markdown/</loc>
+    <loc>https://pavlenko.tech/tags/Markdown/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Tutorial/</loc>
+    <loc>https://pavlenko.tech/tags/Tutorial/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Documentation/</loc>
+    <loc>https://pavlenko.tech/tags/Documentation/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/AI/</loc>
+    <loc>https://pavlenko.tech/tags/AI/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Development/</loc>
+    <loc>https://pavlenko.tech/tags/Development/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Best%20Practices/</loc>
+    <loc>https://pavlenko.tech/tags/Best%20Practices/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Architecture/</loc>
+    <loc>https://pavlenko.tech/tags/Architecture/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/JavaScript/</loc>
+    <loc>https://pavlenko.tech/tags/JavaScript/</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>undefined/tags/Web/</loc>
+    <loc>https://pavlenko.tech/tags/Web/</loc>
     <priority>0.5</priority>
   </url>
 </urlset>
