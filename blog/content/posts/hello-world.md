@@ -4,7 +4,7 @@ date: 2025-03-23
 tags: [hello, blog]
 ---
 
-# Hello World!
+# Привет мир!
 
 This is your first blog post. Edit it or create a new one in the `blog/content/posts` directory.
 
