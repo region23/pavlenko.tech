@@ -24,13 +24,31 @@ program
   .option('-c, --config <path>', 'Path to config file', './blog/config.json')
   .option('-o, --output <directory>', 'Output directory', './dist')
   .option('-v, --verbose', 'Verbose output')
+  .option('-d, --debug', 'Show debug information')
   .action(async (options) => {
     try {
       console.log('Building site...');
+      
+      if (options.debug) {
+        console.log('Debug info:');
+        console.log(`- Current working directory: ${process.cwd()}`);
+        console.log(`- Config path: ${path.resolve(options.config)}`);
+        console.log(`- Output directory: ${path.resolve(options.output)}`);
+        
+        // Check if config file exists
+        try {
+          fs.accessSync(options.config, fs.constants.R_OK);
+          console.log(`- Config file exists and is readable`);
+        } catch (err) {
+          console.log(`- Config file does not exist or is not readable: ${err.message}`);
+        }
+      }
+      
       await buildSite({
         configPath: options.config,
         outputDir: options.output,
-        verbose: options.verbose
+        verbose: options.verbose,
+        debug: options.debug
       });
       console.log('Build completed successfully!');
     } catch (error) {
@@ -88,8 +106,10 @@ program
     // Initialize project structure
     const dirs = [
       'blog/content/posts',
+      'blog/content/about',
       'blog/templates',
       'blog/css',
+      'blog/css/components',
       'blog/images'
     ];
     
@@ -101,32 +121,75 @@ program
       }
     });
     
-    // Create default config
+    // Copy default files from engine/defaults
+    console.log('Copying default files to blog directory...');
+    
+    // Copy config.json
     const configPath = path.join(targetDir, 'blog/config.json');
     if (!fs.existsSync(configPath)) {
-      const defaultConfig = {
-        _version: "1.0.0",
-        site: {
-          title: 'My Markdown Blog',
-          description: 'A static blog built with markdown-blog-engine',
-          language: 'en'
-        },
-        content: {
-          postsPerPage: 5,
-          showReadingTime: true
-        },
-        paths: {
-          contentDir: './blog/content',
-          outputDir: './dist'
-        }
-      };
-      
-      fs.writeFileSync(
-        configPath, 
-        JSON.stringify(defaultConfig, null, 2)
+      fs.copyFileSync(
+        path.join(__dirname, '../defaults/config.json'),
+        configPath
       );
-      console.log('Created default config.json');
+      console.log('Copied default config.json');
     }
+    
+    // Copy default templates
+    const templatesDir = path.join(targetDir, 'blog/templates');
+    const defaultTemplatesDir = path.join(__dirname, '../defaults/templates');
+    fs.readdirSync(defaultTemplatesDir).forEach(file => {
+      const targetPath = path.join(templatesDir, file);
+      if (!fs.existsSync(targetPath)) {
+        fs.copyFileSync(
+          path.join(defaultTemplatesDir, file),
+          targetPath
+        );
+      }
+    });
+    console.log('Copied default templates');
+    
+    // Copy default CSS files
+    const cssDir = path.join(targetDir, 'blog/css');
+    const defaultCssDir = path.join(__dirname, '../defaults/css');
+    fs.readdirSync(defaultCssDir).forEach(file => {
+      if (file !== 'components') {  // Skip the components directory for now
+        const targetPath = path.join(cssDir, file);
+        if (!fs.existsSync(targetPath)) {
+          fs.copyFileSync(
+            path.join(defaultCssDir, file),
+            targetPath
+          );
+        }
+      }
+    });
+    
+    // Copy CSS components
+    const cssComponentsDir = path.join(targetDir, 'blog/css/components');
+    const defaultCssComponentsDir = path.join(__dirname, '../defaults/css/components');
+    fs.readdirSync(defaultCssComponentsDir).forEach(file => {
+      const targetPath = path.join(cssComponentsDir, file);
+      if (!fs.existsSync(targetPath)) {
+        fs.copyFileSync(
+          path.join(defaultCssComponentsDir, file),
+          targetPath
+        );
+      }
+    });
+    console.log('Copied default CSS files');
+    
+    // Copy default images
+    const imagesDir = path.join(targetDir, 'blog/images');
+    const defaultImagesDir = path.join(__dirname, '../defaults/images');
+    fs.readdirSync(defaultImagesDir).forEach(file => {
+      const targetPath = path.join(imagesDir, file);
+      if (!fs.existsSync(targetPath)) {
+        fs.copyFileSync(
+          path.join(defaultImagesDir, file),
+          targetPath
+        );
+      }
+    });
+    console.log('Copied default images');
     
     // Create Telegram IV template
     const telegramTemplatePath = path.join(targetDir, 'blog/telegram-iv-template.txt');
@@ -189,6 +252,32 @@ This blog engine supports all standard Markdown features.
       
       fs.writeFileSync(samplePostPath, samplePost);
       console.log('Created sample blog post');
+    }
+    
+    // Create sample about page
+    const aboutDirPath = path.join(targetDir, 'blog/content/about');
+    const aboutPagePath = path.join(aboutDirPath, 'index.md');
+    if (!fs.existsSync(aboutPagePath)) {
+      const aboutPage = `---
+title: About This Blog
+---
+
+# About This Blog
+
+This is an about page. Edit it to tell your readers about yourself and your blog.
+
+## About Me
+
+Write something about yourself here.
+
+## Contact
+
+- Email: your.email@example.com
+- Twitter: @yourhandle
+`;
+      
+      fs.writeFileSync(aboutPagePath, aboutPage);
+      console.log('Created sample about page');
     }
     
     // Update package.json or create if it doesn't exist

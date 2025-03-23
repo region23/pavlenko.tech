@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { getConfig } = require('./configManager');
 
 // Template cache to improve performance
 const templateCache = {};
@@ -40,19 +41,21 @@ function clearCache() {
 }
 
 /**
- * Load a template file and cache it
- * @param {string} templateName - Name of the template file without extension
+ * Load a template file
+ * @param {string} templateName - Name of the template
  * @returns {string} - Template content
  */
 function loadTemplate(templateName) {
-  const templatePath = path.join(process.cwd(), config.templatesDir, `${templateName}.html`);
+  const config = getConfig();
+  const templatePath = path.join(config.paths.templatesDir || path.join(process.cwd(), 'blog/templates'), `${templateName}.html`);
   
-  // Return from cache if available and caching is enabled
-  if (config.cacheTemplates && templateCache[templatePath]) {
-    return templateCache[templatePath];
-  }
-  
+  // Try loading from user templates first
   try {
+    // Return from cache if available and caching is enabled
+    if (config.cacheTemplates && templateCache[templatePath]) {
+      return templateCache[templatePath];
+    }
+    
     const template = fs.readFileSync(templatePath, 'utf-8');
     
     // Cache template if caching is enabled
@@ -62,8 +65,22 @@ function loadTemplate(templateName) {
     
     return template;
   } catch (error) {
-    console.error(`Error loading template ${templateName}:`, error);
-    return ''; // Return empty string on error
+    // If template not found in user templates, try engine defaults
+    const engineDefaultPath = path.join(__dirname, '..', 'defaults', 'templates', `${templateName}.html`);
+    
+    try {
+      const template = fs.readFileSync(engineDefaultPath, 'utf-8');
+      
+      if (config.cacheTemplates) {
+        templateCache[templatePath] = template;
+      }
+      
+      return template;
+    } catch (defaultError) {
+      console.error(`Error loading template ${templateName}:`, error);
+      console.error(`Also tried engine default at ${engineDefaultPath}:`, defaultError);
+      return ''; // Return empty string on error
+    }
   }
 }
 

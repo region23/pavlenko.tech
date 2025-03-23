@@ -22,7 +22,9 @@ const CONFIG_SCHEMA = {
   },
   paths: {
     contentDir: { type: 'string', required: true },
-    outputDir: { type: 'string', required: true }
+    templatesDir: { type: 'string', required: true },
+    outputDir: { type: 'string', required: true },
+    cssDir: { type: 'string', required: true }
   }
 };
 
@@ -38,8 +40,10 @@ const DEFAULT_CONFIG = {
     postsPerPage: 10
   },
   paths: {
-    contentDir: './content',
-    outputDir: './dist'
+    contentDir: './blog/content',
+    templatesDir: './blog/templates',
+    outputDir: './dist',
+    cssDir: './blog/css'
   }
 };
 
@@ -235,11 +239,39 @@ function resolvePaths(config, basePath) {
   // Resolve paths.contentDir and paths.outputDir if they exist
   if (result.paths) {
     if (result.paths.contentDir && !path.isAbsolute(result.paths.contentDir)) {
-      result.paths.contentDir = path.resolve(basePath, result.paths.contentDir);
+      // Check if path already contains the base directory to avoid duplication
+      const contentPath = path.resolve(basePath, result.paths.contentDir);
+      // If contentDir is something like './blog/content' but basePath already ends with 'blog',
+      // we want to avoid creating paths like 'blog/blog/content'
+      if (path.basename(basePath) === 'blog' && result.paths.contentDir.startsWith('./blog/')) {
+        result.paths.contentDir = path.resolve(path.dirname(basePath), result.paths.contentDir);
+      } else {
+        result.paths.contentDir = contentPath;
+      }
     }
     
     if (result.paths.outputDir && !path.isAbsolute(result.paths.outputDir)) {
       result.paths.outputDir = path.resolve(basePath, result.paths.outputDir);
+    }
+    
+    if (result.paths.templatesDir && !path.isAbsolute(result.paths.templatesDir)) {
+      // Apply same logic to templatesDir to prevent duplication
+      const templatesPath = path.resolve(basePath, result.paths.templatesDir);
+      if (path.basename(basePath) === 'blog' && result.paths.templatesDir.startsWith('./blog/')) {
+        result.paths.templatesDir = path.resolve(path.dirname(basePath), result.paths.templatesDir);
+      } else {
+        result.paths.templatesDir = templatesPath;
+      }
+    }
+    
+    if (result.paths.cssDir && !path.isAbsolute(result.paths.cssDir)) {
+      // Apply same logic to cssDir to prevent duplication
+      const cssPath = path.resolve(basePath, result.paths.cssDir);
+      if (path.basename(basePath) === 'blog' && result.paths.cssDir.startsWith('./blog/')) {
+        result.paths.cssDir = path.resolve(path.dirname(basePath), result.paths.cssDir);
+      } else {
+        result.paths.cssDir = cssPath;
+      }
     }
   }
   
@@ -256,7 +288,7 @@ function resolvePaths(config, basePath) {
  */
 async function loadConfig(options = {}) {
   const {
-    configPath = path.join(process.cwd(), 'config.json'),
+    configPath = path.join(process.cwd(), 'blog/config.json'),
     useCache = true,
     outputDir
   } = typeof options === 'string' ? { configPath: options } : options;

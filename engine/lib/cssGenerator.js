@@ -80,26 +80,28 @@ function generateCssVariables() {
 }
 
 /**
- * Write the generated CSS variables to a file
+ * Write CSS variables to a file
  * @returns {Promise<void>}
  */
 async function writeCssVariables() {
+  const config = getConfig();
+  const css = generateCssVariables();
+  
   try {
-    const config = getConfig();
-    const outputDir = path.join(process.cwd(), 'css', 'components');
-    const outputFile = path.join(outputDir, 'variables.css');
+    // Try to use the configured cssDir from config, or fallback to a default
+    const cssDir = config.paths.cssDir || path.join(__dirname, '../css');
     
-    // Ensure the directory exists
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
+    // Create components directory if it doesn't exist
+    const componentsDir = path.join(cssDir, 'components');
+    if (!fs.existsSync(componentsDir)) {
+      fs.mkdirSync(componentsDir, { recursive: true });
     }
     
-    // Generate the CSS content
-    const cssContent = generateCssVariables();
+    // Write CSS variables file
+    const cssVariablesPath = path.join(componentsDir, 'variables.css');
+    fs.writeFileSync(cssVariablesPath, css);
     
-    // Write to file
-    fs.writeFileSync(outputFile, cssContent);
-    console.log('CSS variables written to:', outputFile);
+    console.log(`CSS variables written to: ${cssVariablesPath}`);
   } catch (error) {
     console.error('Error writing CSS variables:', error);
   }

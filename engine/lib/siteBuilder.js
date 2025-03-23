@@ -10,6 +10,7 @@ const cheerio = require('cheerio');
 const { loadConfig, getConfig } = require('./configManager');
 const { readFile, writeFile, ensureDirectoryExists, listFiles, copyDirectory } = require('./fileHandler');
 const { renderMarkdown, extractFrontmatter, calculateReadingTime, formatDate, updateConfig: updateMarkdownConfig } = require('./markdownProcessor');
+const { writeCssVariables } = require('./cssGenerator');
 const { 
   generatePage, 
   generatePostContent, 
@@ -120,34 +121,62 @@ async function processPostFile(filePath, filename) {
 }
 
 /**
- * Load all posts from the content directory
- * @param {Object} options - Processing options
- * @returns {Array} - Array of processed posts
+ * Load all markdown posts from the content directory
+ * @param {Object} options - Options for loading posts
+ * @returns {Promise<Array>} - Array of processed post objects
  */
 async function loadAllPosts(options = {}) {
   const config = getConfig();
-  const POSTS_DIR = config.paths.postsDir;
+  const postsDir = config.paths.postsDir || path.join(config.paths.contentDir, 'posts');
+  
+  log(`Loading posts from ${postsDir}`, options);
+  
+  if (options.debug) {
+    console.log(`Debug: Loading posts from ${postsDir}`);
+    // Check if directory exists and list contents
+    try {
+      const stats = fs.statSync(postsDir);
+      if (!stats.isDirectory()) {
+        console.log(`Debug: Posts path is not a directory: ${postsDir}`);
+      } else {
+        console.log(`Debug: Posts directory exists: ${postsDir}`);
+        const contents = fs.readdirSync(postsDir);
+        console.log(`Debug: Directory contains ${contents.length} items:`, contents);
+      }
+    } catch (err) {
+      console.log(`Debug: Error accessing posts directory: ${err.message}`);
+    }
+  }
   
   try {
-    log('Loading and processing markdown files...', options);
+    // Get list of markdown files in the posts directory
+    const files = await listFiles(postsDir, '.md');
     
-    // Scan posts directory for markdown files
-    const files = await listFiles(POSTS_DIR, '.md');
+    if (options.debug) {
+      console.log(`Debug: Found ${files?.length || 0} markdown files in ${postsDir}`);
+    }
+    
+    if (!files || files.length === 0) {
+      console.warn('No markdown files found in posts directory');
+      return [];
+    }
+    
     log(`Found ${files.length} markdown files`, options);
     
     // Process each file
     const posts = await Promise.all(
-      files.map(filename => 
-        processPostFile(path.join(POSTS_DIR, filename), filename)
-      )
+      files.map(async filename => {
+        const filePath = path.join(postsDir, filename);
+        return processPostFile(filePath, filename);
+      })
     );
     
-    // Filter out null entries and sort by date
-    const validPosts = posts
-      .filter(post => post !== null)
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Filter out any null results (failed processing)
+    const validPosts = posts.filter(post => post !== null);
     
-    log(`Processed ${validPosts.length} valid posts`, options);
+    // Sort posts by date (newest first)
+    validPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
     return validPosts;
   } catch (error) {
     console.error('Error loading posts:', error);
@@ -186,7 +215,7 @@ async function generateStaticAssets(options = {}) {
     const staticDirs = ['css', 'js', 'images'];
     
     await Promise.all(staticDirs.map(async (dir) => {
-      const sourcePath = path.join(__dirname, '../../', dir);
+      const sourcePath = path.join(__dirname, '../', dir);
       const destPath = path.join(config.paths.outputDir, dir);
       
       if (fs.existsSync(sourcePath)) {
@@ -199,7 +228,7 @@ async function generateStaticAssets(options = {}) {
     const rootFiles = ['.htaccess', '_redirects', 'favicon.ico', '.nojekyll'];
     
     await Promise.all(rootFiles.map(async (file) => {
-      const sourcePath = path.join(__dirname, '../../', file);
+      const sourcePath = path.join(__dirname, '../', file);
       const destPath = path.join(config.paths.outputDir, file);
       
       if (fs.existsSync(sourcePath)) {
@@ -437,51 +466,48 @@ async function buildTagsIndexPage(tags, options = {}) {
 }
 
 /**
- * Build about page
+ * Build the about page if one exists in the content/about directory
  * @param {Object} options - Build options
  */
 async function buildAboutPage(options = {}) {
   const config = getConfig();
+  const aboutDir = config.paths.aboutDir || path.join(config.paths.contentDir, 'about');
+  const outputDir = config.paths.outputDir;
+  
+  log('Building about page...', options);
   
   try {
-    log('Building about page...', options);
+    // Try to find an index.md file in the about directory
+    const aboutPath = path.join(aboutDir, 'index.md');
+    let aboutContent;
     
-    const aboutPath = path.join(config.paths.aboutDir, 'index.md');
-    
-    if (fs.existsSync(aboutPath)) {
-      const aboutContent = await readFile(aboutPath);
-      const { content, data } = extractFrontmatter(aboutContent);
-      
-      // Generate HTML from markdown
-      const html = renderMarkdown(content);
-      
-      // Generate page content
-      const pageContent = `
-        <div class="about-page">
-          <h1>${data.title || 'Обо мне'}</h1>
-          <div class="about-content">
-            ${html}
-          </div>
-        </div>
-      `;
-      
-      // Generate full page HTML
-      const fullHtml = generatePage({
-        title: data.title || 'Обо мне',
-        description: data.description || config.site.description,
-        content: pageContent,
-        config
-      });
-      
-      // Create directory and write file
-      const aboutDir = path.join(config.paths.outputDir, 'about');
-      await writeOutput(path.join(aboutDir, 'index.html'), fullHtml);
-    } else {
-      log('About page content not found, skipping', options);
+    try {
+      aboutContent = await readFile(aboutPath);
+    } catch (error) {
+      // No about page found, skip
+      log('No about page found, skipping...', options);
+      return;
     }
+    
+    // Extract frontmatter and render markdown
+    const { content, data } = extractFrontmatter(aboutContent);
+    const htmlContent = renderMarkdown(content);
+    
+    // Generate the page
+    const page = generatePage({
+      title: data.title || 'About',
+      description: data.description || config.site.description,
+      content: htmlContent,
+      config
+    });
+    
+    // Write to output
+    const outputPath = path.join(outputDir, 'about', 'index.html');
+    await writeOutput(outputPath, page);
+    
+    log('About page built successfully', options);
   } catch (error) {
     console.error('Error building about page:', error);
-    throw error;
   }
 }
 
@@ -557,59 +583,94 @@ async function buildSitemap(posts, options = {}) {
 }
 
 /**
- * Build the entire site
+ * Main function to build the complete static site
  * @param {Object} options - Build options
+ * @returns {Promise<void>}
  */
 async function buildSite(options = {}) {
-  const buildOptions = { ...DEFAULT_OPTIONS, ...options };
+  // Parse options
+  const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
+  const {
+    configPath = path.join(process.cwd(), 'blog/config.json'),
+    verbose = false,
+    clean = false,
+    outputDir,
+    debug = false
+  } = mergedOptions;
+  
+  console.log('Starting site build...');
   
   try {
-    console.log('Starting site build...');
-    
     // Load configuration
-    await loadConfig();
-    const config = getConfig();
+    const config = await loadConfig({
+      configPath,
+      useCache: false,
+      outputDir
+    });
     
-    // Update module configurations based on site config
-    if (config.markdown) {
-      updateMarkdownConfig(config.markdown);
+    if (debug) {
+      console.log('Debug: Configuration paths after loading:');
+      console.log(`- Content directory: ${config.paths.contentDir}`);
+      console.log(`- Posts directory: ${config.paths.postsDir}`);
+      console.log(`- About directory: ${config.paths.aboutDir}`);
+      console.log(`- Templates directory: ${config.paths.templatesDir}`);
+      console.log(`- Output directory: ${config.paths.outputDir}`);
+      
+      // Check if directories exist
+      console.log('Debug: Checking if directories exist:');
+      for (const [name, dirPath] of Object.entries({
+        'Content': config.paths.contentDir,
+        'Posts': config.paths.postsDir,
+        'About': config.paths.aboutDir,
+        'Templates': config.paths.templatesDir
+      })) {
+        try {
+          fs.accessSync(dirPath, fs.constants.R_OK);
+          console.log(`- ${name} directory exists: ${dirPath}`);
+        } catch (err) {
+          console.log(`- ${name} directory does not exist or is not readable: ${dirPath}`);
+        }
+      }
     }
     
-    if (config.templates) {
-      updateTemplateConfig(config.templates);
-    }
-    
-    // Generate CSS variables from appearance config
-    try {
-      const { writeCssVariables } = require('./cssGenerator');
-      await writeCssVariables();
-    } catch (error) {
-      console.error('Error generating CSS variables:', error);
-    }
-    
-    // Create output directory if it doesn't exist
-    await ensureDirectoryExists(config.paths.outputDir);
+    // Initialize the CSS
+    await writeCssVariables();
     
     // Load all posts
-    const posts = await loadAllPosts(buildOptions);
+    const posts = await loadAllPosts({ verbose, debug });
     
-    // Generate static assets
-    await generateStaticAssets(buildOptions);
+    if (debug) {
+      console.log(`Debug: Loaded ${posts.length} posts`);
+    }
     
-    // Build each section of the site in parallel
+    // Extract unique tags from posts
+    const tags = extractTags(posts);
+    
+    // Build all pages in parallel
     await Promise.all([
-      buildHomePage(posts, buildOptions),
-      buildPostPages(posts, buildOptions),
-      buildTagPages(posts, buildOptions),
-      buildAboutPage(buildOptions),
-      buildErrorPage(buildOptions),
-      buildSitemap(posts, buildOptions)
+      // Copy static assets
+      generateStaticAssets({ verbose }),
+      
+      // Build main pages
+      buildHomePage(posts, { verbose }),
+      buildPostPages(posts, { verbose }),
+      
+      // Build tag pages
+      buildTagPages(posts, { verbose }),
+      buildTagsIndexPage(tags, { verbose }),
+      
+      // Build other pages
+      buildAboutPage({ verbose }),
+      
+      // Build sitemap
+      buildSitemap(posts, { verbose })
     ]);
     
     console.log('Site build completed successfully!');
   } catch (error) {
     console.error('Error building site:', error);
-    process.exit(1);
+    await buildErrorPage();
+    throw error;
   }
 }
 
