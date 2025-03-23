@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{{site.language}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{pageTitle}} - {{site.title}}</title>
+    <meta name="description" content="{{pageDescription}}">
+    <link rel="stylesheet" href="/css/main.css">
+    {{#if darkMode}}
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    {{/if}}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="site-title"><a href="/">{{site.title}}</a></h1>
+            <nav>
+                {{#each navigation.items}}
+                <a href="{{url}}" {{#if active}}class="active"{{/if}}>{{label}}</a>
+                {{/each}}
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        {{content}}
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; {{site.copyright}}</p>
+        </div>
+    </footer>
+</body>
+</html> 

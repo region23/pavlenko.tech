@@ -5,11 +5,9 @@
   "private": true,
   "scripts": {
     "start": "npx serve dist",
-    "dev": "npm run generate-static && npx serve dist",
-    "generate-static": "node scripts/lib/build.js",
-    "build": "npm run generate-static",
-    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push",
-    "test": "node scripts/tests/test-build.js"
+    "dev": "blog-engine serve",
+    "build": "blog-engine build",
+    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
   },
   "keywords": [
     "blog",
@@ -18,14 +16,10 @@
   ],
   "author": "Pavlenko",
   "license": "MIT",
-  "devDependencies": {
-    "gray-matter": "^4.0.3",
-    "marked": "^15.0.7",
-    "serve": "^14.2.1"
-  },
   "dependencies": {
-    "cheerio": "^1.0.0",
-    "marked-gfm-heading-id": "^4.1.1",
-    "marked-smartypants": "^1.1.9"
+    "markdown-blog-engine": "file:./engine"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
   }
 }
