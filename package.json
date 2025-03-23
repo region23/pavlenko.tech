@@ -11,6 +11,6 @@
     "deploy": "npm run build && echo \"Deploy command goes here\""
   },
   "dependencies": {
-    "simple-blog-engine": "^2.0.0"
+    "simple-blog-engine": "^3.0.0"
   }
 }
