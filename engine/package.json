@@ -1,22 +1,48 @@
 {
-  "name": "simple-blog",
-  "version": "1.0.0",
-  "description": "Минималистичный движок для блога на Markdown",
+  "name": "simple-blog-engine",
+  "version": "1.2.2",
+  "description": "Современный легковесный генератор статического блога с поддержкой Markdown",
   "main": "lib/index.js",
   "bin": {
-    "blog-engine": "./bin/blog-engine.js"
+    "blog-engine": "bin/blog-engine.js",
+    "simple-blog-engine": "bin/blog-engine.js"
   },
+  "files": [
+    "bin/",
+    "lib/",
+    "defaults/",
+    "js/",
+    "favicon.ico",
+    ".htaccess",
+    ".nojekyll",
+    "_redirects",
+    "telegram-iv-template.txt"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test specified\" && exit 0",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "blog",
     "markdown",
     "static-site",
-    "static-site-generator"
+    "static-site-generator",
+    "blog-engine",
+    "markdown-blog"
   ],
   "author": "Pavlenko",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/region23/simple-blog-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/region23/simple-blog-engine/issues"
+  },
+  "homepage": "https://github.com/region23/simple-blog-engine#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "dependencies": {
     "cheerio": "^1.0.0",
     "commander": "^11.1.0",

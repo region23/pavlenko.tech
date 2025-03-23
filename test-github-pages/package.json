@@ -1,0 +1,19 @@
+{
+  "name": "test-github-pages",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "blog-engine serve",
+    "build": "blog-engine build",
+    "deploy": "npm run build && echo \"Deploy command goes here\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "My blog built with markdown-blog-engine",
+  "dependencies": {
+    "simple-blog-engine": "^1.2.0",
+    "markdown-blog-engine": "^1.0.0"
+  }
+}

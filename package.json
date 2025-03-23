@@ -1,7 +1,7 @@
 {
-  "name": "simple-blog",
+  "name": "my-blog",
   "version": "1.0.0",
-  "description": "Минималистичный движок для блога на Markdown",
+  "description": "Мой блог на Markdown",
   "private": true,
   "scripts": {
     "start": "npx serve dist",
@@ -19,7 +19,7 @@
   "author": "Pavlenko",
   "license": "MIT",
   "dependencies": {
-    "simple-blog": "file:./engine"
+    "simple-blog-engine": "^1.0.0"
   },
   "devDependencies": {
     "serve": "^14.2.1"

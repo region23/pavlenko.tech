@@ -187,6 +187,22 @@ program
     });
     console.log('Copied default images');
     
+    // Create GitHub Actions workflow for GitHub Pages
+    const githubWorkflowsDir = path.join(targetDir, '.github/workflows');
+    if (!fs.existsSync(githubWorkflowsDir)) {
+      fs.mkdirSync(githubWorkflowsDir, { recursive: true });
+      console.log('Created .github/workflows directory');
+    }
+    
+    const githubPagesWorkflowPath = path.join(githubWorkflowsDir, 'github-pages.yml');
+    if (!fs.existsSync(githubPagesWorkflowPath)) {
+      fs.copyFileSync(
+        path.join(__dirname, '../defaults/github/workflows/github-pages.yml'),
+        githubPagesWorkflowPath
+      );
+      console.log('Created GitHub Pages workflow file');
+    }
+    
     // Create Telegram IV template
     const telegramTemplatePath = path.join(targetDir, 'blog/telegram-iv-template.txt');
     if (!fs.existsSync(telegramTemplatePath)) {
@@ -291,7 +307,7 @@ Write something about yourself here.
     // Add/update necessary fields
     packageJson.name = packageJson.name || 'my-markdown-blog';
     packageJson.version = packageJson.version || '1.0.0';
-    packageJson.description = packageJson.description || 'My blog built with markdown-blog-engine';
+    packageJson.description = packageJson.description || 'My blog built with simple-blog-engine';
     
     packageJson.scripts = packageJson.scripts || {};
     packageJson.scripts.dev = 'blog-engine serve';
@@ -299,7 +315,13 @@ Write something about yourself here.
     packageJson.scripts.deploy = 'npm run build && echo "Deploy command goes here"';
     
     packageJson.dependencies = packageJson.dependencies || {};
-    packageJson.dependencies['markdown-blog-engine'] = '^1.0.0';
+    
+    // Удаляем старую зависимость, если она существует
+    if (packageJson.dependencies['markdown-blog-engine']) {
+      delete packageJson.dependencies['markdown-blog-engine'];
+    }
+    
+    packageJson.dependencies['simple-blog-engine'] = '^1.2.0';
     
     fs.writeFileSync(
       packageJsonPath,
