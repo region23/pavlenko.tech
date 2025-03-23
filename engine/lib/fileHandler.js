@@ -156,20 +156,56 @@ async function ensureDirectoryExists(dirPath) {
 
 /**
  * List files in a directory
- * @param {string} dirPath - Path to the directory
- * @param {string} extension - Optional file extension filter
- * @returns {Promise<string[]>} - Array of file names
+ * @param {string} dirPath - Directory path
+ * @param {Object|string} options - Options object or file extension
+ * @param {boolean} options.fullPath - Return full paths instead of just filenames
+ * @param {RegExp|string} options.filter - RegExp or string extension to filter files
+ * @returns {Promise<string[]>} - Array of file names or paths
  */
-async function listFiles(dirPath, extension = null) {
+async function listFiles(dirPath, options = {}) {
+  // Handle legacy usage where extension was passed directly
+  if (typeof options === 'string') {
+    const ext = options.startsWith('.') ? options : `.${options}`;
+    options = { filter: ext };
+  }
+  
+  const { fullPath = false, filter = null } = options;
+  
   return handleOperation(
     async () => {
-      const files = await readDirAsync(dirPath);
-      if (extension) {
-        return files.filter(file => file.endsWith(extension));
+      try {
+        // Check if directory exists first
+        await statAsync(dirPath);
+        
+        const allEntries = await readDirAsync(dirPath, { withFileTypes: true });
+        const files = allEntries.filter(entry => entry.isFile());
+        
+        let result = files.map(file => file.name);
+        
+        // Apply filter if provided
+        if (filter) {
+          if (filter instanceof RegExp) {
+            result = result.filter(file => filter.test(file));
+          } else if (typeof filter === 'string') {
+            // Handle both '.md' and 'md' formats
+            const ext = filter.startsWith('.') ? filter : `.${filter}`;
+            result = result.filter(file => file.endsWith(ext));
+          }
+        }
+        
+        // Convert to full paths if requested
+        if (fullPath) {
+          result = result.map(file => path.join(dirPath, file));
+        }
+        
+        return result;
+      } catch (error) {
+        console.error(`Error listing files in ${dirPath}:`, error.message);
+        return [];
       }
-      return files;
     },
-    `Error listing files in ${dirPath}`
+    `Error listing files in ${dirPath}`,
+    false // Don't throw error, return empty array instead
   );
 }
 
@@ -192,8 +228,12 @@ async function copyFile(sourcePath, destPath) {
  * Copy a directory recursively
  * @param {string} sourceDir - Source directory path
  * @param {string} destDir - Destination directory path
+ * @param {Object} options - Copy options
+ * @param {boolean} options.overwrite - Whether to overwrite existing files (default: false)
  */
-async function copyDirectory(sourceDir, destDir) {
+async function copyDirectory(sourceDir, destDir, options = {}) {
+  const { overwrite = false } = options;
+  
   await handleOperation(
     async () => {
       await ensureDirectoryExists(destDir);
@@ -208,14 +248,18 @@ async function copyDirectory(sourceDir, destDir) {
       for (const entry of directories) {
         const sourcePath = path.join(sourceDir, entry.name);
         const destPath = path.join(destDir, entry.name);
-        await copyDirectory(sourcePath, destPath);
+        await copyDirectory(sourcePath, destPath, options);
       }
       
       // Process files in parallel for better performance
       await Promise.all(files.map(async (entry) => {
         const sourcePath = path.join(sourceDir, entry.name);
         const destPath = path.join(destDir, entry.name);
-        await copyFile(sourcePath, destPath);
+        
+        // If overwrite is true or destination doesn't exist, copy the file
+        if (overwrite || !fs.existsSync(destPath)) {
+          await copyFile(sourcePath, destPath);
+        }
       }));
     },
     `Error copying directory from ${sourceDir} to ${destDir}`

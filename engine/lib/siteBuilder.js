@@ -8,7 +8,7 @@ const fs = require('fs');
 const cheerio = require('cheerio');
 
 const { loadConfig, getConfig } = require('./configManager');
-const { readFile, writeFile, ensureDirectoryExists, listFiles, copyDirectory } = require('./fileHandler');
+const { readFile, writeFile, ensureDirectoryExists, listFiles, copyDirectory, copyFile } = require('./fileHandler');
 const { renderMarkdown, extractFrontmatter, calculateReadingTime, formatDate, updateConfig: updateMarkdownConfig } = require('./markdownProcessor');
 const { writeCssVariables } = require('./cssGenerator');
 const { 
@@ -211,18 +211,52 @@ async function generateStaticAssets(options = {}) {
   const config = getConfig();
   
   try {
-    // Copy static directories
-    const staticDirs = ['css', 'js', 'images'];
+    // Copy engine static directories: js and images, but NOT css (will be handled separately)
+    const staticDirs = ['js', 'images'];
     
     await Promise.all(staticDirs.map(async (dir) => {
       const sourcePath = path.join(__dirname, '../', dir);
       const destPath = path.join(config.paths.outputDir, dir);
       
       if (fs.existsSync(sourcePath)) {
-        log(`Copying ${dir} directory...`, options);
+        log(`Copying engine ${dir} directory...`, options);
         await copyDirectory(sourcePath, destPath);
       }
     }));
+    
+    // Create CSS directory in output
+    const destCssDir = path.join(config.paths.outputDir, 'css');
+    await ensureDirectoryExists(destCssDir);
+    
+    // Copy blog CSS files - these are the primary source for styling
+    const blogCssDir = path.join(process.cwd(), 'blog/css');
+    
+    if (fs.existsSync(blogCssDir)) {
+      log(`Copying blog CSS files...`, options);
+      
+      // List files for debugging
+      const allFiles = await listFiles(blogCssDir);
+      log(`Found files in ${blogCssDir}: ${JSON.stringify(allFiles)}`, options);
+      
+      // Copy CSS files from the root blog/css directory
+      const cssFiles = await listFiles(blogCssDir, { fullPath: true, filter: /\.css$/ });
+      log(`CSS files to copy: ${JSON.stringify(cssFiles)}`, options);
+      
+      for (const file of cssFiles) {
+        const fileName = path.basename(file);
+        await copyFile(file, path.join(destCssDir, fileName));
+        log(`Copied ${fileName} to ${destCssDir}`, options);
+      }
+    }
+    
+    // Copy blog images
+    const blogImagesDir = path.join(process.cwd(), 'blog/images');
+    const destImagesDir = path.join(config.paths.outputDir, 'images');
+    
+    if (fs.existsSync(blogImagesDir)) {
+      log(`Copying blog images...`, options);
+      await copyDirectory(blogImagesDir, destImagesDir);
+    }
     
     // Copy root files 
     const rootFiles = ['.htaccess', '_redirects', 'favicon.ico', '.nojekyll'];
@@ -360,7 +394,8 @@ async function buildPostPages(posts, options = {}) {
         config,
         meta: {
           canonical: `${config.site.url}${post.url}`
-        }
+        },
+        bodyClass: 'post-page'
       });
       
       // Create directory and write file

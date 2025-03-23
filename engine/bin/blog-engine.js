@@ -109,7 +109,6 @@ program
       'blog/content/about',
       'blog/templates',
       'blog/css',
-      'blog/css/components',
       'blog/images'
     ];
     
@@ -151,8 +150,16 @@ program
     // Copy default CSS files
     const cssDir = path.join(targetDir, 'blog/css');
     const defaultCssDir = path.join(__dirname, '../defaults/css');
+    
+    // Create CSS directory if it doesn't exist
+    if (!fs.existsSync(cssDir)) {
+      fs.mkdirSync(cssDir, { recursive: true });
+    }
+    
+    // Copy CSS files from defaults
     fs.readdirSync(defaultCssDir).forEach(file => {
-      if (file !== 'components') {  // Skip the components directory for now
+      // Only copy .css files
+      if (file.endsWith('.css')) {
         const targetPath = path.join(cssDir, file);
         if (!fs.existsSync(targetPath)) {
           fs.copyFileSync(
@@ -160,19 +167,6 @@ program
             targetPath
           );
         }
-      }
-    });
-    
-    // Copy CSS components
-    const cssComponentsDir = path.join(targetDir, 'blog/css/components');
-    const defaultCssComponentsDir = path.join(__dirname, '../defaults/css/components');
-    fs.readdirSync(defaultCssComponentsDir).forEach(file => {
-      const targetPath = path.join(cssComponentsDir, file);
-      if (!fs.existsSync(targetPath)) {
-        fs.copyFileSync(
-          path.join(defaultCssComponentsDir, file),
-          targetPath
-        );
       }
     });
     console.log('Copied default CSS files');

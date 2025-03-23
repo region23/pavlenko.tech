@@ -91,14 +91,13 @@ async function writeCssVariables() {
     // Try to use the configured cssDir from config, or fallback to a default
     const cssDir = config.paths.cssDir || path.join(__dirname, '../css');
     
-    // Create components directory if it doesn't exist
-    const componentsDir = path.join(cssDir, 'components');
-    if (!fs.existsSync(componentsDir)) {
-      fs.mkdirSync(componentsDir, { recursive: true });
+    // Create css directory if it doesn't exist
+    if (!fs.existsSync(cssDir)) {
+      fs.mkdirSync(cssDir, { recursive: true });
     }
     
     // Write CSS variables file
-    const cssVariablesPath = path.join(componentsDir, 'variables.css');
+    const cssVariablesPath = path.join(cssDir, 'generated.css');
     fs.writeFileSync(cssVariablesPath, css);
     
     console.log(`CSS variables written to: ${cssVariablesPath}`);

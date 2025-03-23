@@ -227,9 +227,10 @@ function renderComponent(templateName, data = {}, preprocessor = null) {
  * @param {string} options.content - Main content HTML
  * @param {Object} options.config - Site configuration
  * @param {Object} options.meta - Additional meta information
+ * @param {string} options.bodyClass - CSS class for body tag
  * @returns {string} - Complete HTML document
  */
-function generatePage({ title, description, content, config, meta = {} }) {
+function generatePage({ title, description, content, config, meta = {}, bodyClass = '' }) {
   // Generate header and footer
   const header = generateHeader(config);
   const footer = generateFooter(config);
@@ -242,7 +243,8 @@ function generatePage({ title, description, content, config, meta = {} }) {
     canonical: meta.canonical ? `<link rel="canonical" href="${meta.canonical}">` : '',
     header: header,
     content: content,
-    footer: footer
+    footer: footer,
+    body_class: bodyClass
   });
 }
 
