@@ -1,16 +1,14 @@
 {
-  "name": "pavlenko-tech-blog",
+  "name": "simple-blog",
   "version": "1.0.0",
-  "description": "Технический блог на Markdown",
+  "description": "Минималистичный движок для блога на Markdown",
   "private": true,
   "scripts": {
     "start": "npx serve dist",
-    "dev": "npm run generate-static && npx serve dist",
-    "update-index": "node scripts/generate-index.js",
-    "generate-static": "node scripts/static-site-generator.js",
-    "generate": "npm run generate-static",
-    "build": "npm run update-index && npm run generate-static",
-    "deploy": "npm run build && git add . && git commit -m 'Update content' && git push"
+    "dev": "blog-engine serve",
+    "build": "blog-engine build",
+    "init": "blog-engine init",
+    "deploy": "npm run build && echo \"Deploy command goes here\""
   },
   "keywords": [
     "blog",
@@ -19,14 +17,11 @@
   ],
   "author": "Pavlenko",
   "license": "MIT",
-  "devDependencies": {
-    "gray-matter": "^4.0.3",
-    "marked": "^15.0.7",
-    "serve": "^14.2.1"
-  },
   "dependencies": {
-    "cheerio": "^1.0.0",
-    "marked-gfm-heading-id": "^4.1.1",
-    "marked-smartypants": "^1.1.9"
+    "simple-blog": "^1.0.0",
+    "markdown-blog-engine": "^1.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
   }
 }

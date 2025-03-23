@@ -1,0 +1,28 @@
+{
+  "name": "simple-blog",
+  "version": "1.0.0",
+  "description": "Минималистичный движок для блога на Markdown",
+  "main": "lib/index.js",
+  "bin": {
+    "blog-engine": "./bin/blog-engine.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blog",
+    "markdown",
+    "static-site",
+    "static-site-generator"
+  ],
+  "author": "Pavlenko",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "commander": "^11.1.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.7",
+    "marked-gfm-heading-id": "^4.1.1",
+    "marked-smartypants": "^1.1.9"
+  }
+} 

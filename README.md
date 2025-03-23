@@ -1,184 +1,249 @@
-# Static Blog Generator
+# Simple Blog
 
-A modern, lightweight static blog with a powerful configuration system, allowing customization without editing code.
+Современный легковесный генератор статического блога с поддержкой Markdown, оптимизированный для производительности, поисковых систем и удобного обмена контентом.
 
-## Features
+## Особенности
 
-- Fully configurable through a single `config.json` file
-- Static site generation for fast loading and best SEO practices
-- Responsive design for mobile and desktop
-- Dark mode support
-- Tag-based categorization
-- Markdown content with code highlighting
-- Automatic reading time calculation
-- Configurable appearance (colors, fonts, etc.)
-- Automatic pagination based on config settings
-- Sitemap.xml generation for better SEO
-- Lightning-fast performance with minimal JavaScript
+- **Генерация статического HTML**: Предварительно отрендеренные HTML файлы для оптимальной производительности и SEO
+- **Контент в Markdown**: Написание постов в формате Markdown с метаданными в frontmatter
+- **Система шаблонов**: Настраиваемые HTML шаблоны
+- **Адаптивный дизайн**: Подход "mobile-first" с адаптивными макетами
+- **Темная/Светлая тема**: Автоматическое определение предпочтений системы с возможностью ручного переключения
+- **Организация по тегам**: Категоризация постов с помощью тегов
+- **Расчет времени чтения**: Автоматическая оценка времени чтения статей
+- **Telegram Instant View**: Оптимизированный контент для функции Instant View в Telegram
+- **Открытый исходный код**: Легко обновляемый движок, отделенный от контента
+- **Модульность**: Полное разделение движка и контента для простого обновления и переноса
 
-## Getting Started
+## Структура проекта
 
-1. Clone this repository
-2. Customize `config.json` file
-3. Add your blog posts to the `content/posts` folder in Markdown format
-4. Run `npm run build` to generate static files
-5. The generated static site will be in the `dist` folder
-6. Serve the blog using your preferred static hosting (GitHub Pages, Netlify, Vercel, etc.)
-
-## Scripts
-
-- `npm run start` - Serve the generated static site locally
-- `npm run dev` - Generate the site and serve it locally for development
-- `npm run update-index` - Update the post index file
-- `npm run generate-static` - Generate the static site
-- `npm run build` - Update the index and generate the static site
-- `npm run deploy` - Build, commit and push to GitHub (triggers automatic deployment)
-
-## Configuration
-
-The blog is fully customizable through the `config.json` file. You can modify the following settings:
-
-### Site Configuration
-
-```json
-"site": {
-  "title": "Your Blog Title",
-  "description": "Your blog description here",
-  "language": "en",
-  "copyright": "© 2025 Your Name",
-  "hostname": "your-domain.com"
-}
+```
+├── engine/               # Движок блога (независимый компонент)
+│   ├── lib/              # Основная функциональность движка
+│   │   ├── build.js
+│   │   ├── configManager.js
+│   │   ├── cssGenerator.js
+│   │   ├── fileHandler.js
+│   │   ├── index.js
+│   │   ├── markdownProcessor.js
+│   │   ├── siteBuilder.js
+│   │   └── templateEngine.js
+│   ├── bin/              # CLI интерфейс
+│   │   └── blog-engine.js
+│   ├── defaults/         # Шаблоны и стили по умолчанию
+│   │   ├── templates/    # HTML шаблоны по умолчанию
+│   │   ├── css/          # CSS стили по умолчанию
+│   │   ├── images/       # Стандартные изображения
+│   │   └── config.json   # Стандартная конфигурация
+│   ├── .htaccess         # Конфигурация Apache
+│   ├── favicon.ico       # Фавиконка
+│   ├── _redirects        # Правила переадресации для Netlify
+│   ├── .nojekyll         # Флаг для GitHub Pages
+│   └── telegram-iv-template.txt # Шаблон для Telegram Instant View
+│
+├── blog/                 # Контент блога (сохраняется при обновлении движка)
+│   ├── content/          # Markdown контент
+│   │   ├── posts/        # Посты блога
+│   │   └── about/        # Содержимое страницы "О блоге"
+│   ├── templates/        # HTML шаблоны (переопределяют шаблоны по умолчанию)
+│   ├── css/              # CSS стили для конкретного блога
+│   ├── images/           # Изображения
+│   ├── config.json       # Конфигурация сайта
+│   └── telegram-iv-template.txt # Шаблон для Telegram Instant View (опционально)
+│
+└── dist/                 # Сгенерированный статический сайт (результат)
 ```
 
-### Navigation
+## Начало работы
 
-```json
-"navigation": {
-  "items": [
-    {
-      "label": "Blog",
-      "url": "/"
-    },
-    {
-      "label": "Tags",
-      "url": "/tags"
-    },
-    {
-      "label": "About",
-      "url": "/about"
-    }
-  ]
-}
+### Установка существующего блога
+
+1. Клонируйте этот репозиторий
+2. Установите зависимости: `npm install`
+3. Запустите `npm run dev` для локальной разработки
+4. Запустите `npm run build` для генерации статического сайта
+
+### Создание нового блога
+
+1. Установите пакет: `npm install`
+2. Инициализируйте новый блог: `npm run init`
+3. Запустите `npm run dev` для начала работы
+
+## Повседневное использование блога
+
+### Создание и редактирование постов
+
+1. **Создание нового поста**:
+   - Создайте новый файл `.md` в директории `blog/content/posts/`
+   - Добавьте необходимые метаданные в формате frontmatter
+   - Напишите контент в формате Markdown
+
+   ```markdown
+   ---
+   title: "Заголовок вашего поста"
+   date: "2023-03-23"
+   tags: ["разработка", "markdown"]
+   summary: "Краткое описание вашего поста"
+   author: "Ваше имя"
+   ---
+
+   # Заголовок
+
+   Ваш контент в формате markdown...
+   ```
+
+2. **Добавление изображений**:
+   - Поместите изображения в директорию `blog/images/`
+   - Ссылайтесь на них в постах: `![Описание](/images/ваше-изображение.jpg)`
+
+3. **Редактирование страницы "О блоге"**:
+   - Отредактируйте файл `blog/content/about/index.md`
+
+### Настройка блога
+
+1. **Редактирование конфигурации**:
+   - Отредактируйте файл `blog/config.json` для изменения:
+     - Заголовка и описания блога
+     - Языка блога
+     - Навигационного меню
+     - Настроек внешнего вида (цвета, шрифты)
+     - Количества постов на странице
+
+2. **Настройка шаблонов**:
+   - Отредактируйте файлы в директории `blog/templates/` для изменения HTML структуры
+   - Основные шаблоны:
+     - `base.html` - Базовый шаблон всех страниц
+     - `header.html` - Шапка сайта
+     - `footer.html` - Подвал сайта
+     - `post.html` - Шаблон отдельного поста
+     - `post-card.html` - Шаблон превью поста на главной странице
+
+3. **Настройка стилей**:
+   - Отредактируйте файлы в директории `blog/css/` для изменения визуального стиля
+   - Основные файлы стилей:
+     - `all.css` - Основной файл со всеми компонентами и стилями
+     - `generated.css` - CSS переменные (автоматически генерируются из конфигурации)
+
+### Настройка стилей
+
+Стили в блоге построены на модульной структуре из двух основных файлов:
+
+1. **generated.css** - Автоматически генерируется на основе настроек из `blog/config.json`. Содержит CSS переменные для:
+   - Цветовой схемы (основные цвета, акцентные цвета, темная тема)
+   - Типографики (шрифты, размеры)
+   - Отступов и размеров
+   - Эффектов и анимаций
+   
+   > Важно: этот файл не нужно редактировать вручную, все изменения делаются в разделе `appearance` файла `blog/config.json`
+
+2. **all.css** - Основной файл стилей, содержащий все компоненты:
+   - Базовые стили и сбросы
+   - Типографику
+   - Компоненты (кнопки, карточки, навигация)
+   - Макеты и сетки
+   - Утилиты
+
+Оба файла размещаются в директории `blog/css/` и напрямую подключаются в шаблоне:
+
+```html
+<link rel="stylesheet" href="/css/generated.css">
+<link rel="stylesheet" href="/css/all.css">
 ```
 
-### Social Links
+### Сборка и публикация
+
+1. **Локальная разработка**:
+   - Запустите `npm run dev` для локального предпросмотра блога
+   - Доступен по адресу: http://localhost:3000
+
+2. **Сборка для продакшена**:
+   - Запустите `npm run build` для генерации статических файлов
+   - Результат будет в директории `dist/`
+
+3. **Отладка сборки**:
+   - Используйте флаг `--debug` для детальной информации: `npm run build -- --debug`
+   - Это выведет пути, используемые при сборке, и прочую отладочную информацию
+
+4. **Публикация блога**:
+   - Загрузите содержимое директории `dist/` на ваш хостинг
+   - Для GitHub Pages используйте `npm run deploy` (настройте в package.json)
+   - Для Netlify/Vercel укажите команду сборки `npm run build` и директорию `dist/`
+
+## Скрипты
+
+- `npm run start` - Локальный запуск сгенерированного статического сайта
+- `npm run dev` - Сборка сайта и локальный запуск для разработки с автоматическим обновлением
+- `npm run build` - Генерация статического сайта для продакшена
+- `npm run init` - Инициализация нового блога со стандартными шаблонами и настройками
+- `npm run deploy` - Сборка и деплой через git push (требуется настройка)
+
+## Обновление движка
+
+Движок блога полностью отделен от контента, что позволяет легко обновлять его без потери пользовательских данных:
+
+1. Обновите код в директории `engine/`
+2. Запустите `npm install` для обновления зависимостей
+3. Запустите `npm run build` для проверки работоспособности
+
+Ваш контент в директории `blog/` останется неизменным при обновлении движка.
+
+## Конфигурация
+
+Сайт настраивается через файл `blog/config.json`. Пример конфигурации:
 
 ```json
-"social": {
-  "links": [
-    {
-      "platform": "GitHub",
-      "url": "https://github.com/yourusername"
-    },
-    {
-      "platform": "Twitter",
-      "url": "https://twitter.com/yourusername"
-    },
-    {
-      "platform": "LinkedIn",
-      "url": "https://linkedin.com/in/yourusername"
-    }
-  ]
-}
-```
-
-### Appearance
-
-```json
-"appearance": {
-  "colors": {
-    "primary": "#3f51b5",
-    "secondary": "#ff4081",
-    "accent": "#00bcd4",
-    "background": "#ffffff",
-    "surface": "#f5f5f5",
-    "text": "#212121",
-    "border": "#e0e0e0"
+{
+  "site": {
+    "title": "Название вашего блога",
+    "description": "Описание вашего блога",
+    "language": "ru",
+    "copyright": "© 2025 Название вашего блога"
   },
-  "darkMode": {
-    "background": "#121212",
-    "surface": "#1e1e1e",
-    "text": "#ffffff",
-    "border": "#333333"
+  "navigation": {
+    "items": [
+      {"label": "Блог", "url": "/", "active": true},
+      {"label": "Теги", "url": "/tags"},
+      {"label": "О блоге", "url": "/about"}
+    ]
   },
-  "fonts": {
-    "main": "Inter",
-    "code": "JetBrains Mono"
+  "social": {
+    "links": [
+      {"platform": "GitHub", "url": "https://github.com/your_github_username"},
+      {"platform": "Twitter", "url": "https://twitter.com/your_twitter_username"},
+      {"platform": "LinkedIn", "url": "https://linkedin.com/in/your_linkedin_username"}
+    ]
+  },
+  "appearance": {
+    "colors": {
+      "primary": "#18181b",
+      "secondary": "#64748b",
+      "accent": "#3b82f6",
+      "background": "#fafafa",
+      "surface": "#fafafa",
+      "text": "#1e293b",
+      "border": "#e2e8f0"
+    },
+    "darkMode": {
+      "background": "#121212",
+      "surface": "#1e1e1e",
+      "text": "#e2e8f0",
+      "secondary": "#94a3b8",
+      "border": "#2d3748"
+    },
+    "fonts": {
+      "main": "Inter",
+      "code": "JetBrains Mono"
+    }
+  },
+  "content": {
+    "postsPerPage": 7,
+    "showReadingTime": true,
+    "defaultAuthor": "Автор блога",
+    "wordsPerMinute": 200
   }
 }
 ```
 
-### Content Settings
-
-```json
-"content": {
-  "postsPerPage": 10,
-  "showReadingTime": true,
-  "defaultAuthor": "Your Name",
-  "wordsPerMinute": 200
-}
-```
-
-## Blog Post Format
-
-Create Markdown files in the `content/posts` folder with the following frontmatter:
-
-```markdown
----
-title: "Your Post Title"
-date: "2025-01-01"
-tags: ["tag1", "tag2"]
-author: "Author Name" # Optional, defaults to config.defaultAuthor
-summary: "A brief summary of your post"
----
-
-Your post content in Markdown format...
-```
-
-## How It Works
-
-This blog now uses a static site generation approach:
-
-1. All content is written in Markdown with frontmatter
-2. The static generator processes Markdown content and generates HTML files
-3. Pagination is pre-rendered based on the `postsPerPage` setting in the config
-4. A minimal amount of JavaScript is included for:
-   - Dark mode toggle
-   - Optional interactive elements
-5. All pages are generated as static HTML, resulting in:
-   - Faster page loads
-   - Better SEO
-   - Improved security
-   - Lower hosting costs
-
-## Automated Deployment
-
-The blog includes GitHub Actions configuration for automatic deployment:
-
-1. Commit and push your changes to the main branch
-2. GitHub Actions will build the static site
-3. The built site will be deployed to GitHub Pages
-
-You can customize the deployment in the `.github/workflows/build-deploy.yml` file.
-
-## Customization
-
-For advanced customization beyond the configuration file, you can:
-
-1. Edit the CSS in `css/style.css`
-2. Modify the static site generator in `scripts/static-site-generator.js`
-3. Update the JavaScript in the `js` folder
-
-## License
+## Лицензия
 
 MIT 
