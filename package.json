@@ -8,6 +8,7 @@
     "dev": "blog-engine serve",
     "build": "blog-engine build",
     "init": "blog-engine init",
+    "new": "blog-engine new",
     "deploy": "npm run build && echo \"Deploy command goes here\""
   },
   "keywords": [

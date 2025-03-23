@@ -9,6 +9,7 @@ const templateEngine = require('./templateEngine');
 const configManager = require('./configManager');
 const fileHandler = require('./fileHandler');
 const cssGenerator = require('./cssGenerator');
+const postGenerator = require('./postGenerator');
 
 module.exports = {
   // Site building
@@ -33,5 +34,9 @@ module.exports = {
   ensureDirectoryExists: fileHandler.ensureDirectoryExists,
   
   // CSS processing
-  generateCSS: cssGenerator.generateCSS
+  generateCSS: cssGenerator.generateCSS,
+  
+  // Post generation
+  createPost: postGenerator.createPost,
+  generateSlug: postGenerator.generateSlug
 }; 

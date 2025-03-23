@@ -9,6 +9,8 @@ const { program } = require('commander');
 const path = require('path');
 const fs = require('fs');
 const { buildSite } = require('../lib/index');
+const readline = require('readline');
+const { createPost } = require('../lib/postGenerator');
 
 // Get package version
 const packageJson = require('../package.json');
@@ -310,6 +312,42 @@ Write something about yourself here.
     console.log('  npm run build');
     console.log('\nTo serve your blog locally, run:');
     console.log('  npm run dev');
+  });
+
+program
+  .command('new')
+  .description('Create a new blog post template')
+  .option('-d, --directory <path>', 'Blog directory', './blog')
+  .action((options) => {
+    // Create readline interface when needed
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    
+    // Prompt for post title
+    rl.question('Enter the title for your new post: ', (title) => {
+      if (!title.trim()) {
+        console.error('Error: Post title cannot be empty');
+        rl.close();
+        return;
+      }
+      
+      console.log(`Creating new post: "${title}"...`);
+      
+      // Create the post
+      const result = createPost(title, options.directory);
+      
+      if (result.success) {
+        console.log(`Post created successfully!`);
+        console.log(`Path: ${result.path}`);
+        console.log(`Slug: ${result.slug}`);
+      } else {
+        console.error(`Error creating post: ${result.error}`);
+      }
+      
+      rl.close();
+    });
   });
 
 // Parse command line arguments
