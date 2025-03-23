@@ -1,8 +1,0 @@
-{
-    "mcpServers": {
-      "docs-manager": {
-        "command": "npx",
-        "args": ["-y", "mcp-docs-service", "/Users/pavlenko/code/my_projects/geekgpt/docs"]
-      }
-    }
-  }
