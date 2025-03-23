@@ -1,256 +1,121 @@
-# Static Blog Generator
+# Pavlenko.Tech Blog
 
-A modern, lightweight static blog with a modular architecture, high performance, and a powerful configuration system, allowing customization without editing code.
+Современный легковесный генератор статического блога с поддержкой Markdown, оптимизированный для производительности, поисковых систем и удобного обмена контентом.
 
-## Features
+## Особенности
 
-- Fully configurable through a single `config.json` file
-- Modular architecture with clean separation of concerns
-- Efficient caching system for markdown rendering and file operations
-- Static site generation for fast loading and best SEO practices
-- Responsive design for mobile and desktop
-- Dark mode support
-- Tag-based categorization
-- Markdown content with code highlighting
-- Automatic reading time calculation
-- Table of contents generation
-- Configurable appearance (colors, fonts, etc.)
-- Automatic pagination based on config settings
-- Sitemap.xml generation for better SEO
-- Lightning-fast performance with minimal JavaScript
+- **Генерация статического HTML**: Предварительно отрендеренные HTML файлы для оптимальной производительности и SEO
+- **Гибридный рендеринг**: Статический HTML для ботов/краулеров, клиентская навигация для пользователей
+- **Контент в Markdown**: Написание постов в формате Markdown с метаданными в frontmatter
+- **Система шаблонов**: Настраиваемые HTML шаблоны
+- **Адаптивный дизайн**: Подход "mobile-first" с адаптивными макетами
+- **Темная/Светлая тема**: Автоматическое определение предпочтений системы с возможностью ручного переключения
+- **Организация по тегам**: Категоризация постов с помощью тегов
+- **Расчет времени чтения**: Автоматическая оценка времени чтения статей
+- **Telegram Instant View**: Оптимизированный контент для функции Instant View в Telegram
+- **Деплой через GitHub Actions**: Автоматический процесс сборки и публикации
+- **Настройка через конфигурацию**: Централизованный файл config.json для кастомизации без изменения кода
 
-## Architecture
+## Структура проекта
 
-The project follows a modular architecture with clear separation of concerns:
-
-- **markdownProcessor.js** - Handles markdown parsing, frontmatter extraction, and rendering
-- **fileHandler.js** - Manages all file system operations with efficient caching
-- **configManager.js** - Handles configuration loading, validation, and schema checking
-- **templateEngine.js** - Provides flexible HTML template rendering
-- **siteBuilder.js** - Orchestrates the site building process
-
-## Getting Started
-
-1. Clone this repository
-2. Customize `config.json` file
-3. Add your blog posts to the `content/posts` folder in Markdown format
-4. Run `npm run build` to generate static files
-5. The generated static site will be in the `dist` folder
-6. Serve the blog using your preferred static hosting (GitHub Pages, Netlify, Vercel, etc.)
-
-## Scripts
-
-- `npm run start` - Serve the generated static site locally
-- `npm run dev` - Generate the site and serve it locally for development
-- `npm run update-index` - Update the post index file
-- `npm run generate-static` - Generate the static site
-- `npm run build` - Update the index and generate the static site
-- `npm run deploy` - Build, commit and push to GitHub (triggers automatic deployment)
-- `npm run test` - Run the test script to verify the functionality of all modules
-
-## Configuration
-
-The blog is fully customizable through the `config.json` file. You can modify the following settings:
-
-### Site Configuration
-
-```json
-"site": {
-  "title": "Your Blog Title",
-  "description": "Your blog description here",
-  "language": "en",
-  "copyright": "© 2025 Your Name",
-  "url": "https://your-domain.com"
-}
+```
+├── content/               # Файлы контента в Markdown
+│   ├── posts/             # Посты блога
+│   └── about/             # Содержимое страницы "О блоге"
+├── templates/             # HTML шаблоны
+├── css/                   # CSS стили
+│   └── components/        # Модульные CSS компоненты
+├── js/                    # Клиентский JavaScript
+├── images/                # Изображения и активы сайта
+├── scripts/               # Скрипты сборки
+│   └── lib/               # Основные библиотечные модули
+├── dist/                  # Сгенерированный статический сайт (результат)
+├── config.json            # Конфигурация сайта
+└── telegram-iv-template.txt # Шаблон для Telegram Instant View
 ```
 
-### Navigation
+## Начало работы
 
-```json
-"navigation": {
-  "items": [
-    {
-      "label": "Blog",
-      "url": "/"
-    },
-    {
-      "label": "Tags",
-      "url": "/tags"
-    },
-    {
-      "label": "About",
-      "url": "/about"
-    }
-  ]
-}
-```
+1. Клонируйте этот репозиторий
+2. Установите зависимости: `npm install`
+3. Настройте `config.json` с вашими данными
+4. Добавьте ваши посты в формате Markdown в директорию `content/posts/`
+5. Запустите `npm run build` для генерации статического сайта
+6. Сгенерированный сайт будет находиться в директории `dist/`
+7. Разместите на вашем хостинге или используйте GitHub Pages
 
-### Social Links
+## Добавление контента
 
-```json
-"social": {
-  "links": [
-    {
-      "platform": "GitHub",
-      "url": "https://github.com/yourusername"
-    },
-    {
-      "platform": "Twitter",
-      "url": "https://twitter.com/yourusername"
-    },
-    {
-      "platform": "LinkedIn",
-      "url": "https://linkedin.com/in/yourusername"
-    }
-  ]
-}
-```
-
-### Appearance
-
-```json
-"appearance": {
-  "colors": {
-    "primary": "#3f51b5",
-    "secondary": "#ff4081",
-    "accent": "#00bcd4",
-    "background": "#ffffff",
-    "surface": "#f5f5f5",
-    "text": "#212121",
-    "border": "#e0e0e0"
-  },
-  "darkMode": {
-    "background": "#121212",
-    "surface": "#1e1e1e",
-    "text": "#ffffff",
-    "border": "#333333"
-  },
-  "fonts": {
-    "main": "Inter",
-    "code": "JetBrains Mono"
-  }
-}
-```
-
-### Content Settings
-
-```json
-"content": {
-  "postsPerPage": 10,
-  "showReadingTime": true,
-  "defaultAuthor": "Your Name",
-  "wordsPerMinute": 200
-}
-```
-
-### Advanced Module Configuration
-
-You can also configure the individual modules:
-
-```json
-"markdown": {
-  "cacheRendering": true,
-  "readingTime": {
-    "wordsPerMinute": 200,
-    "minMinutes": 1
-  },
-  "dateFormat": {
-    "locale": "en-US",
-    "options": {
-      "year": "numeric",
-      "month": "long",
-      "day": "numeric"
-    }
-  }
-},
-"templates": {
-  "cacheTemplates": true,
-  "templatesDir": "templates"
-},
-"files": {
-  "enableCache": true,
-  "cacheTTL": 60000
-}
-```
-
-## Blog Post Format
-
-Create Markdown files in the `content/posts` folder with the following frontmatter:
+Создавайте Markdown файлы в директории `content/posts/` с метаданными в формате frontmatter:
 
 ```markdown
 ---
-title: "Your Post Title"
-date: "2025-01-01"
-tags: ["tag1", "tag2"]
-author: "Author Name" # Optional, defaults to config.defaultAuthor
-summary: "A brief summary of your post"
+title: "Заголовок вашего поста"
+date: "ГГГГ-ММ-ДД"
+tags: ["тег1", "тег2"]
+summary: "Краткое описание вашего поста"
 ---
 
-Your post content in Markdown format...
+Ваш контент в формате markdown...
 ```
 
-## How It Works
+## Скрипты
 
-This blog uses an optimized static site generation approach:
+- `npm run start` - Локальный запуск сгенерированного статического сайта
+- `npm run dev` - Сборка сайта и локальный запуск для разработки
+- `npm run build` - Генерация статического сайта для продакшена
+- `npm run deploy` - Сборка и деплой через git push (запускает GitHub Actions workflow)
+- `npm run test` - Запуск тестов для проверки генерации сайта
 
-1. All content is written in Markdown with frontmatter
-2. The `configManager` loads and validates the site configuration
-3. The `markdownProcessor` renders Markdown content to HTML with caching for improved performance
-4. The `templateEngine` handles HTML template rendering with component-based approach
-5. The `fileHandler` manages all file operations with caching and parallel processing
-6. The `siteBuilder` orchestrates the whole process, generating:
-   - Home page with pagination
-   - Individual post pages
-   - Tag pages
-   - About page
-   - 404 error page
-   - Sitemap.xml
+## Конфигурация
 
-The generated static site offers:
-- Faster page loads
-- Better SEO
-- Improved security
-- Lower hosting costs
+Сайт полностью настраивается через файл `config.json`:
 
-## Performance Optimizations
-
-The codebase includes several performance optimizations:
-
-1. **Caching System:**
-   - Markdown rendering results are cached
-   - Frequently accessed files are cached
-   - Templates are cached for repeated use
-
-2. **Parallel Processing:**
-   - Multiple site sections are built in parallel
-   - File operations use Promise.all for concurrency
-
-3. **Efficient File Operations:**
-   - Native Node.js APIs for optimal performance
-   - Smart detection of file changes
-
-4. **Reduced Code Duplication:**
-   - Reusable components and functions
-   - Centralized error handling
-
-## Testing
-
-The project includes a test script to verify the functionality of all modules:
-
-```
-npm run test
+```json
+{
+  "site": {
+    "title": "Название вашего блога",
+    "description": "Описание вашего блога",
+    "language": "ru"
+  },
+  "navigation": {
+    "items": [
+      {"label": "Блог", "url": "/"},
+      {"label": "Теги", "url": "/tags"},
+      {"label": "О блоге", "url": "/about"}
+    ]
+  },
+  "appearance": {
+    "colors": {
+      "primary": "#18181b",
+      "secondary": "#64748b"
+      // другие цвета...
+    },
+    "darkMode": {
+      // цвета для темной темы...
+    }
+  }
+}
 ```
 
-This will run a complete site build with verbose logging to ensure all components work correctly together.
+## Как это работает
 
-## Customization
+Этот блог использует гибридный подход к рендерингу:
 
-For advanced customization beyond the configuration file, you can:
+1. **Статическая генерация**: Весь контент предварительно рендерится в статический HTML во время сборки
+2. **Определение ботов**: Поисковые системы и платформы обмена контентом получают статический HTML
+3. **SPA для пользователей**: Обычные посетители получают клиентское SPA-взаимодействие
+4. **Интеграция с Telegram**: Специальный шаблон для Telegram Instant View
 
-1. Edit the CSS in `css/style.css`
-2. Modify the templates in the `templates` folder
-3. Extend the static site generator modules in `scripts/lib`
+## Технологии
 
-## License
+- Node.js для скриптов сборки
+- Vanilla JavaScript для клиентской части
+- HTML шаблоны с собственным шаблонизатором
+- CSS с модульной архитектурой
+- Markdown с frontmatter для контента
+- GitHub Actions для CI/CD
+
+## Лицензия
 
 MIT 
