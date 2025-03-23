@@ -1,4 +1,4 @@
-# Pavlenko.Tech Blog
+# Simple Blog
 
 Современный легковесный генератор статического блога с поддержкой Markdown, оптимизированный для производительности, поисковых систем и удобного обмена контентом.
 
@@ -20,30 +20,36 @@
 ```
 ├── engine/               # Движок блога (независимый компонент)
 │   ├── lib/              # Основная функциональность движка
+│   │   ├── build.js
+│   │   ├── configManager.js
+│   │   ├── cssGenerator.js
+│   │   ├── fileHandler.js
+│   │   ├── index.js
+│   │   ├── markdownProcessor.js
+│   │   ├── siteBuilder.js
+│   │   └── templateEngine.js
 │   ├── bin/              # CLI интерфейс
-│   ├── css/              # CSS стили
-│   ├── js/               # JavaScript файлы
-│   ├── docs/             # Документация по движку
+│   │   └── blog-engine.js
 │   ├── defaults/         # Шаблоны и стили по умолчанию
 │   │   ├── templates/    # HTML шаблоны по умолчанию
 │   │   ├── css/          # CSS стили по умолчанию
 │   │   ├── images/       # Стандартные изображения
 │   │   └── config.json   # Стандартная конфигурация
-│   ├── memory-bank/      # Информация о проекте
 │   ├── .htaccess         # Конфигурация Apache
 │   ├── favicon.ico       # Фавиконка
 │   ├── _redirects        # Правила переадресации для Netlify
-│   └── .nojekyll         # Флаг для GitHub Pages
+│   ├── .nojekyll         # Флаг для GitHub Pages
+│   └── telegram-iv-template.txt # Шаблон для Telegram Instant View
 │
 ├── blog/                 # Контент блога (сохраняется при обновлении движка)
 │   ├── content/          # Markdown контент
 │   │   ├── posts/        # Посты блога
 │   │   └── about/        # Содержимое страницы "О блоге"
-│   ├── templates/        # HTML шаблоны
+│   ├── templates/        # HTML шаблоны (переопределяют шаблоны по умолчанию)
 │   ├── css/              # CSS стили для конкретного блога
 │   ├── images/           # Изображения
 │   ├── config.json       # Конфигурация сайта
-│   └── telegram-iv-template.txt # Шаблон для Telegram Instant View
+│   └── telegram-iv-template.txt # Шаблон для Telegram Instant View (опционально)
 │
 └── dist/                 # Сгенерированный статический сайт (результат)
 ```
@@ -59,11 +65,9 @@
 
 ### Создание нового блога
 
-1. Установите пакет глобально: `npm install -g markdown-blog-engine`
-2. Создайте новую директорию для блога: `mkdir my-blog && cd my-blog`
-3. Инициализируйте новый блог: `blog-engine init`
-4. Запустите `npm install` для установки зависимостей
-5. Запустите `npm run dev` для начала работы
+1. Установите пакет: `npm install`
+2. Инициализируйте новый блог: `npm run init`
+3. Запустите `npm run dev` для начала работы
 
 ## Повседневное использование блога
 
@@ -146,7 +150,6 @@
 <link rel="stylesheet" href="/css/all.css">
 ```
 
-
 ### Сборка и публикация
 
 1. **Локальная разработка**:
@@ -166,27 +169,13 @@
    - Для GitHub Pages используйте `npm run deploy` (настройте в package.json)
    - Для Netlify/Vercel укажите команду сборки `npm run build` и директорию `dist/`
 
-## Добавление контента
-
-Создавайте Markdown файлы в директории `blog/content/posts/` с метаданными в формате frontmatter:
-
-```markdown
----
-title: "Заголовок вашего поста"
-date: "ГГГГ-ММ-ДД"
-tags: ["тег1", "тег2"]
-summary: "Краткое описание вашего поста"
----
-
-Ваш контент в формате markdown...
-```
-
 ## Скрипты
 
 - `npm run start` - Локальный запуск сгенерированного статического сайта
-- `npm run dev` - Сборка сайта и локальный запуск для разработки
+- `npm run dev` - Сборка сайта и локальный запуск для разработки с автоматическим обновлением
 - `npm run build` - Генерация статического сайта для продакшена
-- `npm run deploy` - Сборка и деплой через git push
+- `npm run init` - Инициализация нового блога со стандартными шаблонами и настройками
+- `npm run deploy` - Сборка и деплой через git push (требуется настройка)
 
 ## Обновление движка
 
@@ -198,47 +187,59 @@ summary: "Краткое описание вашего поста"
 
 Ваш контент в директории `blog/` останется неизменным при обновлении движка.
 
-## Расширение функциональности
-
-1. **Добавление новых шаблонов**:
-   - Создайте новые HTML файлы в директории `blog/templates/`
-   - Используйте их в коде движка или через существующие шаблоны
-
-2. **Добавление новых стилей**:
-   - Создайте новые CSS файлы в директории `blog/css/`
-   - При необходимости импортируйте их в шаблон HTML или объедините с файлом `all.css`
-
-3. **Создание плагинов**:
-   - Разрабатывайте функциональность в отдельных JS файлах в директории `engine/lib/`
-   - Интегрируйте их с основными компонентами движка
-
 ## Конфигурация
 
-Сайт настраивается через файл `blog/config.json`:
+Сайт настраивается через файл `blog/config.json`. Пример конфигурации:
 
 ```json
 {
   "site": {
     "title": "Название вашего блога",
     "description": "Описание вашего блога",
-    "language": "ru"
+    "language": "ru",
+    "copyright": "© 2025 Название вашего блога"
   },
   "navigation": {
     "items": [
-      {"label": "Блог", "url": "/"},
+      {"label": "Блог", "url": "/", "active": true},
       {"label": "Теги", "url": "/tags"},
       {"label": "О блоге", "url": "/about"}
+    ]
+  },
+  "social": {
+    "links": [
+      {"platform": "GitHub", "url": "https://github.com/your_github_username"},
+      {"platform": "Twitter", "url": "https://twitter.com/your_twitter_username"},
+      {"platform": "LinkedIn", "url": "https://linkedin.com/in/your_linkedin_username"}
     ]
   },
   "appearance": {
     "colors": {
       "primary": "#18181b",
-      "accent": "#3b82f6"
+      "secondary": "#64748b",
+      "accent": "#3b82f6",
+      "background": "#fafafa",
+      "surface": "#fafafa",
+      "text": "#1e293b",
+      "border": "#e2e8f0"
+    },
+    "darkMode": {
+      "background": "#121212",
+      "surface": "#1e1e1e",
+      "text": "#e2e8f0",
+      "secondary": "#94a3b8",
+      "border": "#2d3748"
     },
     "fonts": {
       "main": "Inter",
       "code": "JetBrains Mono"
     }
+  },
+  "content": {
+    "postsPerPage": 7,
+    "showReadingTime": true,
+    "defaultAuthor": "Автор блога",
+    "wordsPerMinute": 200
   }
 }
 ```

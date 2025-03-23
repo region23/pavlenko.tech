@@ -344,7 +344,7 @@ async function buildHomePage(posts, options = {}) {
       // Generate page content
       const content = `
         <div class="posts-list">
-          <h1 class="page-title">Latest Posts</h1>
+          <h1 class="page-title">Последние публикации</h1>
           ${postCards}
           ${pagination}
         </div>

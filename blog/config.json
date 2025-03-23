@@ -1,9 +1,9 @@
 {
   "site": {
-    "title": "Pavlenko.Tech",
-    "description": "Авторский блог Павла Павленко про разработку и AI",
+    "title": "Blog name",
+    "description": "Blog description",
     "language": "ru",
-    "copyright": "© 2025 Pavlenko.Tech"
+    "copyright": "© 2025 Blog name"
   },
   "navigation": {
     "items": [
@@ -14,9 +14,9 @@
   },
   "social": {
     "links": [
-      {"platform": "GitHub", "url": "https://github.com/pavlenko"},
-      {"platform": "Twitter", "url": "https://twitter.com/pavlenko"},
-      {"platform": "LinkedIn", "url": "https://linkedin.com/in/pavlenko"}
+      {"platform": "GitHub", "url": "https://github.com/your_github_username"},
+      {"platform": "Twitter", "url": "https://twitter.com/your_twitter_username"},
+      {"platform": "LinkedIn", "url": "https://linkedin.com/in/your_linkedin_username"}
     ]
   },
   "appearance": {
@@ -42,9 +42,9 @@
     }
   },
   "content": {
-    "postsPerPage": 3,
+    "postsPerPage": 7,
     "showReadingTime": true,
-    "defaultAuthor": "Pavel Pavlenko",
+    "defaultAuthor": "Blog author name",
     "wordsPerMinute": 200
   }
 } 
