@@ -1,7 +1,7 @@
 {
-  "name": "markdown-blog-engine",
+  "name": "simple-blog",
   "version": "1.0.0",
-  "description": "Simple static blog engine with Markdown support",
+  "description": "Минималистичный движок для блога на Markdown",
   "main": "lib/index.js",
   "bin": {
     "blog-engine": "./bin/blog-engine.js"

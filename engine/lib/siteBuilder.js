@@ -95,7 +95,7 @@ async function processPostFile(filePath, filename) {
     const formattedDate = formatDate(postData.date);
     
     // Generate post URL
-    const fileName = filename.replace('.md', '');
+    const fileName = filename.replace('.md', '').replace(/ /g, '_');
     const url = `/posts/${fileName}/`;
     
     // Return complete post object
@@ -442,7 +442,7 @@ async function buildTagPages(posts, options = {}) {
       });
       
       // Create directory and write file
-      const tagDir = path.join(config.paths.outputDir, 'tags', encodeURIComponent(tag));
+      const tagDir = path.join(config.paths.outputDir, 'tags', tag.replace(/ /g, '_'));
       await writeOutput(path.join(tagDir, 'index.html'), html);
     }));
 
@@ -469,7 +469,7 @@ async function buildTagsIndexPage(tags, options = {}) {
     const tagLinks = Object.entries(tags)
       .sort(([tagA], [tagB]) => tagA.localeCompare(tagB))
       .map(([tag, posts]) => {
-        return `<a href="/tags/${encodeURIComponent(tag)}/" class="tag">${tag} (${posts.length})</a>`;
+        return `<a href="/tags/${tag.replace(/ /g, '_')}/" class="tag">${tag} (${posts.length})</a>`;
       })
       .join('\n');
     
@@ -604,7 +604,7 @@ async function buildSitemap(posts, options = {}) {
     // Add tag pages
     const tags = extractTags(posts);
     Object.keys(tags).forEach(tag => {
-      sitemap += `  <url>\n    <loc>${config.site.url}/tags/${encodeURIComponent(tag)}/</loc>\n    <priority>0.5</priority>\n  </url>\n`;
+      sitemap += `  <url>\n    <loc>${config.site.url}/tags/${tag.replace(/ /g, '_')}/</loc>\n    <priority>0.5</priority>\n  </url>\n`;
     });
     
     sitemap += '</urlset>';
