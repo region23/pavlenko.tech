@@ -357,6 +357,7 @@ header {
   top: 0;
   background-color: var(--surface-color);
   z-index: 100;
+  width: 100%;
   transition: background-color var(--transition-normal), 
               border-color var(--transition-normal), 
               box-shadow var(--transition-normal),
@@ -393,13 +394,26 @@ header.title-overlap {
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
-nav {
+/* Header and Navigation */
+header nav.container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+@media (min-width: 1024px) {
+  header nav.container {
+    max-width: 960px;
+    padding: 0 var(--space-md);
+  }
 }
 
 .logo {
+  flex-shrink: 0;
   font-weight: 700;
   font-size: 1.5rem;
   letter-spacing: -0.03em;
@@ -407,10 +421,10 @@ nav {
 }
 
 .nav-links {
+  margin-left: auto;
   display: flex;
+  gap: var(--space-md);
   align-items: center;
-  gap: var(--space-lg);
-  justify-content: center;
 }
 
 .nav-link {
@@ -424,25 +438,26 @@ nav {
   color: var(--accent-color);
 }
 
-/* Theme toggle container */
 .theme-toggle-container {
+  margin-left: var(--space-sm);
   display: flex;
   justify-content: flex-end;
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 640px) {
-  nav {
-    flex-direction: column;
-    gap: var(--space-sm);
+@media (max-width: 768px) {
+  header nav.container {
+    flex-wrap: wrap;
   }
   
   .nav-links {
-    margin: var(--space-sm) 0;
+    order: 3;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: var(--space-sm);
   }
   
   .theme-toggle-container {
-    justify-content: center;
+    margin-left: 0;
   }
 }
 
