@@ -44,7 +44,7 @@
   "content": {
     "postsPerPage": 7,
     "showReadingTime": true,
-    "defaultAuthor": "Павел Павленко",
+    "defaultAuthor": "",
     "wordsPerMinute": 200
   }
 } 
