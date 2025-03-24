@@ -1,16 +1,13 @@
 ---
-title: About This Blog
+title: Обо мне
 ---
 
-# About This Blog
+# Обо мне
 
-This is an about page. Edit it to tell your readers about yourself and your blog.
-
-## About Me
-
-Write something about yourself here.
+Привет! Меня зовут Павел Павленко. Я занимаюсь разработкой более 22 лет. Начинал с PHP 4, а сейчас в основном пишу свои проекты на Golang и Python. Увлекаюсь искусственным интеллектом, кайтсёрфингом и электронной музыкой.
 
 ## Contact
 
-- Email: your.email@example.com
-- Twitter: @yourhandle
+- Мой телеграм: https://t.me/region23
+- Канал, где я пишу про технологи: https://t.me/pavlenkodev
+- Про музыку https://t.me/geekmusicru
