@@ -1,22 +1,22 @@
 {
   "site": {
-    "title": "Blog name",
-    "description": "Blog description",
+    "title": "Павленко.Pro | Dev & AI",
+    "description": "Авторский блог Павла Павленко про разработку и AI",
     "language": "ru",
-    "copyright": "© 2025 Blog name"
+    "copyright": "© 2025 Павел Павленко"
   },
   "navigation": {
     "items": [
       {"label": "Блог", "url": "/", "active": true},
       {"label": "Теги", "url": "/tags"},
-      {"label": "О блоге", "url": "/about"}
+      {"label": "Обо мне", "url": "/about"}
     ]
   },
   "social": {
     "links": [
-      {"platform": "GitHub", "url": "https://github.com/your_github_username"},
-      {"platform": "Twitter", "url": "https://twitter.com/your_twitter_username"},
-      {"platform": "LinkedIn", "url": "https://linkedin.com/in/your_linkedin_username"}
+      {"platform": "GitHub", "url": "https://github.com/region23"},
+      {"platform": "Telegram", "url": "https://t.me/pavlenkodev"},
+      {"platform": "LinkedIn", "url": "https://www.linkedin.com/in/region23/"}
     ]
   },
   "appearance": {
@@ -44,7 +44,7 @@
   "content": {
     "postsPerPage": 7,
     "showReadingTime": true,
-    "defaultAuthor": "Blog author name",
+    "defaultAuthor": "Павел Павленко",
     "wordsPerMinute": 200
   }
 } 

@@ -1,6 +1,6 @@
 ---
 title: Hello World
-date: 2025-03-23
+date: 2025-03-24
 tags: [hello, blog]
 ---
 
